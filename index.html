@@ -26,7 +26,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-tight">Dashboard de Tutores (Aba Tutores)</h1>
-                    <p class="text-xs text-indigo-200">Sincronizado via Google Apps Script</p>
+                    <p class="text-xs text-indigo-200">Sincronizado via Google Apps Script (Colunas A a M)</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -46,10 +46,10 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total de Tutores</p>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total de Registros</p>
                     <h3 id="stat-total-tutores" class="text-2xl font-bold text-slate-900 mt-1">0</h3>
                     <span class="text-xs text-indigo-600 font-medium flex items-center gap-1 mt-1">
-                        <i class="fa-solid fa-user-check"></i> Cadastrados na aba
+                        <i class="fa-solid fa-user-check"></i> Linhas na aba
                     </span>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
@@ -59,49 +59,49 @@
 
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Tutores Ativos</p>
-                    <h3 id="stat-tutores-ativos" class="text-2xl font-bold text-slate-900 mt-1">0</h3>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Colunas Carregadas</p>
+                    <h3 id="stat-total-colunas" class="text-2xl font-bold text-slate-900 mt-1">0</h3>
                     <span class="text-xs text-emerald-600 font-medium flex items-center gap-1 mt-1">
-                        <i class="fa-solid fa-circle-check"></i> Em atuação
+                        <i class="fa-solid fa-table-columns"></i> Da coluna A em diante
                     </span>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
-                    <i class="fa-solid fa-user-shield"></i>
+                    <i class="fa-solid fa-layer-group"></i>
                 </div>
             </div>
 
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Média de Alunos / Tutor</p>
-                    <h3 id="stat-media-alunos" class="text-2xl font-bold text-slate-900 mt-1">0</h3>
-                    <span class="text-xs text-blue-600 font-medium mt-1 block">Capacidade média</span>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Sincronização</p>
+                    <h3 class="text-2xl font-bold text-slate-900 mt-1">Automática</h3>
+                    <span class="text-xs text-blue-600 font-medium mt-1 block">Google Apps Script</span>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
-                    <i class="fa-solid fa-users"></i>
+                    <i class="fa-solid fa-bolt"></i>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-6">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-slate-900">Capacidade / Alunos por Tutor</h3>
-                    <span class="text-xs text-slate-400">Aba Tutores</span>
-                </div>
-                <div class="relative h-80">
-                    <canvas id="chartTutoresAlunos"></canvas>
-                </div>
+        <!-- Gráfico -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-slate-900">Visão Geral dos Dados</h3>
+                <span class="text-xs text-slate-400">Aba Tutores</span>
+            </div>
+            <div class="relative h-72">
+                <canvas id="chartTutoresAlunos"></canvas>
             </div>
         </div>
 
+        <!-- Tabela Completa Dinâmica -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <h3 class="font-bold text-slate-900">Lista Completa de Tutores (Aba Tutores)</h3>
+                <h3 class="font-bold text-slate-900">Planilha Completa (Colunas A até M)</h3>
                 
                 <div class="flex items-center gap-3 w-full sm:w-auto">
                     <div class="relative flex-grow sm:w-64">
                         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                        <input type="text" id="searchInput" oninput="filterTable()" placeholder="Buscar tutor..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
+                        <input type="text" id="searchInput" oninput="filterTable()" placeholder="Buscar em qualquer coluna..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
                     </div>
                 </div>
             </div>
@@ -110,7 +110,7 @@
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
                         <tr id="tableHeaderRow" class="bg-slate-50 text-slate-500 border-b border-slate-100 uppercase font-semibold">
-                            <!-- Cabeçalhos gerados dinamicamente na ordem exata da planilha -->
+                            <!-- Preenchido dinamicamente com os cabeçalhos reais da planilha -->
                         </tr>
                     </thead>
                     <tbody id="dataTableBody" class="divide-y divide-slate-100 text-slate-700">
@@ -129,12 +129,10 @@
     </div>
 
     <script>
-        // URL fixa do Apps Script informada
         const scriptUrl = "https://script.google.com/macros/s/AKfycbzbSe8OY2Do4ZA3BOo3lst03S8lHiupSYVKCjoFRgggoTbGUDakcKFnmz2O6fGY1CXuBQ/exec";
-        let dbData = [];
-        let columnKeys = [];
-
-        let chartTutoresAlunosInstance = null;
+        let tableHeaders = [];
+        let tableData = [];
+        let chartInstance = null;
 
         window.onload = function() {
             fetchDataFromAppsScript();
@@ -147,125 +145,107 @@
 
         async function fetchDataFromAppsScript(isBackground = false) {
             try {
-                if(!isBackground) showToast("Buscando dados da aba Tutores...");
+                if(!isBackground) showToast("Buscando dados da planilha...");
                 
                 const response = await fetch(scriptUrl);
                 if (!response.ok) throw new Error("Erro na requisição ao Apps Script");
                 
-                const data = await response.json();
+                const result = await response.json();
                 
-                if (data.error) {
-                    throw new Error(data.error);
+                if (result.error) {
+                    throw new Error(result.error);
                 }
 
-                if (Array.isArray(data) && data.length > 0) {
-                    dbData = data;
-                    // Mantém todas as colunas na ordem exata retornada pela planilha (ignorando apenas o id interno)
-                    columnKeys = Object.keys(data[0]).filter(k => k !== 'id');
-                    
+                if (result.headers && result.data) {
+                    tableHeaders = result.headers;
+                    tableData = result.data;
                     renderDashboard();
                     if(!isBackground) showToast("Dados sincronizados com sucesso!");
                 }
             } catch (error) {
                 console.warn("Erro ao buscar dados:", error);
-                if(!isBackground) showToast("Erro ao conectar. Verifique a URL do Apps Script.", true);
+                if(!isBackground) showToast("Erro ao conectar com a planilha.", true);
             }
         }
 
         function renderDashboard() {
             updateMetrics();
-            renderTable(dbData);
-            renderCharts();
+            renderTableHeaders();
+            renderTable(tableData);
+            renderChart();
         }
 
         function updateMetrics() {
-            const totalTutores = dbData.length;
-            const ativos = dbData.filter(item => {
-                const values = Object.values(item).join(' ').toLowerCase();
-                return values.includes('ativo');
-            }).length;
+            document.getElementById('stat-total-tutores').innerText = tableData.length;
+            document.getElementById('stat-total-colunas').innerText = tableHeaders.length;
+        }
 
-            let totalAlunos = 0;
-            dbData.forEach(item => {
-                for(let key in item) {
-                    if(typeof item[key] === 'number' && key.toLowerCase().includes('aluno')) {
-                        totalAlunos += item[key];
-                    }
-                }
+        function renderTableHeaders() {
+            const headerRow = document.getElementById('tableHeaderRow');
+            headerRow.innerHTML = '';
+            tableHeaders.forEach(header => {
+                const th = document.createElement('th');
+                th.className = "p-4 whitespace-nowrap";
+                th.innerText = header;
+                headerRow.appendChild(th);
             });
-
-            const mediaAlunos = totalTutores > 0 && totalAlunos > 0 ? (totalAlunos / totalTutores).toFixed(1) : 0;
-
-            document.getElementById('stat-total-tutores').innerText = totalTutores;
-            document.getElementById('stat-tutores-ativos').innerText = ativos > 0 ? ativos : totalTutores;
-            document.getElementById('stat-media-alunos').innerText = mediaAlunos;
         }
 
         function renderTable(data) {
-            const headerRow = document.getElementById('tableHeaderRow');
             const tbody = document.getElementById('dataTableBody');
-            
-            headerRow.innerHTML = '';
             tbody.innerHTML = '';
 
-            if(columnKeys.length === 0 && data.length > 0) {
-                columnKeys = Object.keys(data[0]).filter(k => k !== 'id');
-            }
-
-            if(columnKeys.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400">Nenhum dado encontrado nesta aba.</td></tr>`;
-                return;
-            }
-
-            // Renderiza os cabeçalhos na ordem exata da planilha
-            columnKeys.forEach(key => {
-                const th = document.createElement('th');
-                th.className = "p-4 capitalize";
-                th.innerText = key.replace(/([A-Z])/g, ' $1');
-                headerRow.appendChild(th);
-            });
-
             if(data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${columnKeys.length}" class="p-6 text-center text-slate-400">Nenhum resultado encontrado.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${tableHeaders.length || 1}" class="p-6 text-center text-slate-400">Nenhum dado encontrado.</td></tr>`;
                 return;
             }
 
-            // Renderiza as linhas preenchendo cada coluna sequencialmente
-            data.forEach(item => {
+            data.forEach(rowObj => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50/50 transition";
                 
-                let rowHtml = '';
-                columnKeys.forEach(key => {
-                    let val = item[key] !== undefined && item[key] !== null ? item[key] : '';
-                    rowHtml += `<td class="p-4 font-medium text-slate-900">${val}</td>`;
+                tableHeaders.forEach(header => {
+                    const td = document.createElement('td');
+                    td.className = "p-4 whitespace-nowrap text-slate-700";
+                    td.innerText = rowObj[header] !== undefined && rowObj[header] !== null ? rowObj[header] : "";
+                    tr.appendChild(td);
                 });
                 
-                tr.innerHTML = rowHtml;
                 tbody.appendChild(tr);
             });
         }
 
-        function renderCharts() {
-            let nameKey = columnKeys.find(k => k.toLowerCase().includes('nome')) || columnKeys[0];
-            let valueKey = columnKeys.find(k => typeof dbData[0][k] === 'number') || columnKeys[1];
+        function renderChart() {
+            const ctx = document.getElementById('chartTutoresAlunos').getContext('2d');
+            if(chartInstance) chartInstance.destroy();
 
-            const tutorLabels = dbData.map(item => item[nameKey] || 'Tutor');
-            const tutorValues = dbData.map(item => Number(item[valueKey]) || 0);
+            // Pega os primeiros 10 registros e tenta achar uma coluna numérica ou usa o índice para demonstrar o volume
+            const labels = tableData.slice(0, 15).map((row, index) => {
+                // Tenta usar a primeira coluna como rótulo (ex: Nome)
+                return String(row[tableHeaders[0]] || `Item ${index + 1}`);
+            });
 
-            const ctxTutoresAlunos = document.getElementById('chartTutoresAlunos').getContext('2d');
-            if(chartTutoresAlunosInstance) chartTutoresAlunosInstance.destroy();
+            const values = tableData.slice(0, 15).map((row, index) => {
+                // Procura a primeira coluna que pareça conter números ou quantidade
+                for(let key of tableHeaders) {
+                    let val = Number(row[key]);
+                    if(!isNaN(val) && val > 0 && key.toLowerCase() !== 'id') {
+                        return val;
+                    }
+                }
+                return 1; // Fallback
+            });
 
-            chartTutoresAlunosInstance = new Chart(ctxTutoresAlunos, {
+            chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: tutorLabels,
+                    labels: labels,
                     datasets: [{
-                        label: valueKey ? valueKey : 'Valor',
-                        data: tutorValues,
-                        backgroundColor: '#8b5cf6',
+                        label: 'Métrica dos Registros',
+                        data: values,
+                        backgroundColor: '#6366f1',
                         borderRadius: 8,
-                        barThickness: 28
+                        barThickness: 24
                     }]
                 },
                 options: {
@@ -282,8 +262,11 @@
 
         function filterTable() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = dbData.filter(item => {
-                return Object.values(item).some(val => String(val).toLowerCase().includes(query));
+            const filtered = tableData.filter(rowObj => {
+                return tableHeaders.some(header => {
+                    let val = String(rowObj[header] || "").toLowerCase();
+                    return val.includes(query);
+                });
             });
             renderTable(filtered);
         }
