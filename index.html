@@ -6,26 +6,35 @@
     <title>Dashboard - Tutores e Alunos</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js para os gráficos -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- FontAwesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
+        /* Fixar cabeçalho da tabela e scroll interno para preencher a tela */
+        .table-container {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+        .table-container thead th {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background-color: #f8fafc;
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 h-screen flex flex-col overflow-hidden">
 
-    <header class="bg-indigo-600 text-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <header class="bg-indigo-600 text-white shadow-md flex-shrink-0">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
             <div class="flex items-center gap-3">
-                <div class="bg-indigo-700 p-2.5 rounded-xl shadow-inner">
-                    <i class="fa-solid fa-chalkboard-user text-2xl"></i>
+                <div class="bg-indigo-700 p-2 rounded-xl shadow-inner">
+                    <i class="fa-solid fa-chalkboard-user text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight">Dashboard de Tutores (Aba Tutores)</h1>
+                    <h1 class="text-lg font-bold tracking-tight">Dashboard de Tutores (Aba Tutores)</h1>
                     <p class="text-xs text-indigo-200">Sincronizado via Google Apps Script</p>
                 </div>
             </div>
@@ -33,83 +42,35 @@
                 <span id="sync-status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-100 border border-emerald-400/30">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Ao vivo / Sincronizado
                 </span>
-                <button onclick="refreshData()" class="bg-indigo-800 hover:bg-indigo-900 text-white px-3.5 py-2 rounded-xl text-xs font-medium transition shadow flex items-center gap-2 cursor-pointer">
+                <button onclick="refreshData()" class="bg-indigo-800 hover:bg-indigo-900 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow flex items-center gap-2 cursor-pointer">
                     <i class="fa-solid fa-rotate"></i> Atualizar
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-4 flex flex-col overflow-hidden">
         
-        <!-- Cards de Estatísticas da Aba Tutores -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total de Registros</p>
-                    <h3 id="stat-total-tutores" class="text-2xl font-bold text-slate-900 mt-1">0</h3>
-                    <span class="text-xs text-indigo-600 font-medium flex items-center gap-1 mt-1">
-                        <i class="fa-solid fa-user-check"></i> Linhas na aba
-                    </span>
+        <!-- Tabela Completa Dinâmica Fixa na Tela com Filtros Estilo Excel -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col flex-grow overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4 flex-shrink-0">
+                <div class="flex items-center gap-2">
+                    <h3 class="font-bold text-slate-900">Planilha Completa de Tutores</h3>
+                    <span id="stat-total-tutores" class="bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full text-xs font-semibold">0 registros</span>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
-                    <i class="fa-solid fa-chalkboard-user"></i>
-                </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Colunas Carregadas</p>
-                    <h3 id="stat-total-colunas" class="text-2xl font-bold text-slate-900 mt-1">0</h3>
-                    <span class="text-xs text-emerald-600 font-medium flex items-center gap-1 mt-1">
-                        <i class="fa-solid fa-table-columns"></i> Mapeadas da planilha
-                    </span>
-                </div>
-                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
-                    <i class="fa-solid fa-layer-group"></i>
-                </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Sincronização</p>
-                    <h3 class="text-2xl font-bold text-slate-900 mt-1">Automática</h3>
-                    <span class="text-xs text-blue-600 font-medium mt-1 block">Google Apps Script</span>
-                </div>
-                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
-                    <i class="fa-solid fa-bolt"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Gráfico -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-slate-900">Visão Geral dos Dados</h3>
-                <span class="text-xs text-slate-400">Aba Tutores</span>
-            </div>
-            <div class="relative h-72">
-                <canvas id="chartTutoresAlunos"></canvas>
-            </div>
-        </div>
-
-        <!-- Tabela Completa Dinâmica com Filtros Estilo Excel nos Cabeçalhos -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <h3 class="font-bold text-slate-900">Planilha Completa de Tutores</h3>
                 
                 <div class="flex items-center gap-3 w-full sm:w-auto">
                     <div class="relative flex-grow sm:w-64">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                        <input type="text" id="globalSearchInput" oninput="filterTable()" placeholder="Buscar globalmente..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-slate-400 text-xs"></i>
+                        <input type="text" id="globalSearchInput" oninput="filterTable()" placeholder="Buscar globalmente..." class="w-full pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
                     </div>
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="table-container overflow-x-auto flex-grow relative">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
-                        <tr id="tableHeaderRow" class="bg-slate-50 text-slate-500 border-b border-slate-100 uppercase font-semibold">
+                        <tr id="tableHeaderRow" class="bg-slate-50 text-slate-500 border-b border-slate-200 uppercase font-semibold shadow-sm">
                             <!-- Preenchido dinamicamente com os cabeçalhos e menus de filtro estilo Excel -->
                         </tr>
                     </thead>
@@ -132,21 +93,18 @@
         const scriptUrl = "https://script.google.com/macros/s/AKfycbzbSe8OY2Do4ZA3BOo3lst03S8lHiupSYVKCjoFRgggoTbGUDakcKFnmz2O6fGY1CXuBQ/exec";
         let tableHeaders = [];
         let tableData = [];
-        let chartInstance = null;
         let activeDropdown = null;
-        let columnFiltersState = {}; // Armazena o valor selecionado em cada filtro de coluna
+        let columnFiltersState = {};
 
         window.onload = function() {
             fetchDataFromAppsScript();
 
-            // Fecha qualquer menu dropdown de filtro ao clicar fora
             document.addEventListener('click', function(e) {
                 if (!e.target.closest('.filter-dropdown-container')) {
                     closeAllDropdowns();
                 }
             });
 
-            // Atualização automática a cada 30 segundos
             setInterval(() => {
                 fetchDataFromAppsScript(true);
             }, 30000);
@@ -178,15 +136,9 @@
         }
 
         function renderDashboard() {
-            updateMetrics();
+            document.getElementById('stat-total-tutores').innerText = `${tableData.length} registros`;
             renderTableHeaders();
             renderTable(tableData);
-            renderChart();
-        }
-
-        function updateMetrics() {
-            document.getElementById('stat-total-tutores').innerText = tableData.length;
-            document.getElementById('stat-total-colunas').innerText = tableHeaders.length;
         }
 
         function renderTableHeaders() {
@@ -195,9 +147,8 @@
 
             tableHeaders.forEach((header, index) => {
                 const th = document.createElement('th');
-                th.className = "py-2 px-3 whitespace-nowrap relative filter-dropdown-container"; // Padding vertical reduzido para diminuir o espaçamento
+                th.className = "py-2.5 px-3 whitespace-nowrap relative filter-dropdown-container bg-slate-50";
                 
-                // Coleta valores únicos para o menu de filtro estilo Excel
                 const uniqueValues = [...new Set(tableData.map(row => String(row[header] !== undefined && row[header] !== null ? row[header] : "").trim()))].filter(v => v !== "").sort();
 
                 const currentFilter = columnFiltersState[header] || "";
@@ -260,7 +211,7 @@
             }
             closeAllDropdowns();
             filterTable();
-            renderTableHeaders(); // Atualiza ícones/estilos dos cabeçalhos
+            renderTableHeaders();
         }
 
         function clearColumnFilter(header) {
@@ -285,11 +236,10 @@
                 
                 tableHeaders.forEach(header => {
                     const td = document.createElement('td');
-                    td.className = "py-2.5 px-3 whitespace-nowrap text-slate-700"; // Padding vertical otimizado
+                    td.className = "py-2.5 px-3 whitespace-nowrap text-slate-700";
                     
                     let cellValue = rowObj[header] !== undefined && rowObj[header] !== null ? String(rowObj[header]) : "";
                     
-                    // Verifica se a coluna é "produtos de trilha"
                     const normalizedHeader = header.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                     const isTrilhaCol = normalizedHeader.includes("produto") && normalizedHeader.includes("trilha");
 
@@ -300,7 +250,7 @@
                         if (valLower === "entregue") {
                             badgeClass = "bg-emerald-600 text-white px-2.5 py-1 rounded-md font-medium text-[11px] inline-block";
                         } else if (valLower === "nao entregue") {
-                            badgeClass = "bg-amber-400 text-slate-900 px-2.5 py-1 rounded-md font-medium text-[11px] inline-block"; // Amarelo com texto escuro garantindo contraste legível
+                            badgeClass = "bg-amber-400 text-slate-900 px-2.5 py-1 rounded-md font-medium text-[11px] inline-block";
                         } else if (valLower === "nao disponivel" || valLower === "nao se aplica") {
                             badgeClass = "bg-slate-500 text-white px-2.5 py-1 rounded-md font-medium text-[11px] inline-block";
                         }
@@ -321,53 +271,10 @@
             });
         }
 
-        function renderChart() {
-            const ctx = document.getElementById('chartTutoresAlunos').getContext('2d');
-            if(chartInstance) chartInstance.destroy();
-
-            const labels = tableData.slice(0, 15).map((row, index) => {
-                return String(row[tableHeaders[0]] || `Item ${index + 1}`);
-            });
-
-            const values = tableData.slice(0, 15).map((row) => {
-                for(let key of tableHeaders) {
-                    let val = Number(row[key]);
-                    if(!isNaN(val) && val > 0 && key.toLowerCase() !== 'id') {
-                        return val;
-                    }
-                }
-                return 1;
-            });
-
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Métrica dos Registros',
-                        data: values,
-                        backgroundColor: '#6366f1',
-                        borderRadius: 8,
-                        barThickness: 24
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { precision: 0 } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
-        }
-
         function filterTable() {
             const globalQuery = document.getElementById('globalSearchInput').value.toLowerCase();
 
             const filtered = tableData.filter(rowObj => {
-                // 1. Valida o filtro global
                 let matchesGlobal = true;
                 if (globalQuery) {
                     matchesGlobal = tableHeaders.some(header => {
@@ -378,7 +285,6 @@
 
                 if (!matchesGlobal) return false;
 
-                // 2. Valida os filtros do menu estilo Excel por coluna
                 for (let header in columnFiltersState) {
                     const filterVal = columnFiltersState[header].toLowerCase();
                     if (filterVal) {
