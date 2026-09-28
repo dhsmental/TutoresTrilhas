@@ -42,6 +42,17 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
         
+        <!-- Banner de Ajuda sobre Publicação -->
+        <div id="help-banner" class="bg-indigo-50 border border-indigo-200 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-indigo-900">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-circle-info text-indigo-600 text-base"></i>
+                <div>
+                    <span class="font-semibold">Dica de Sincronização:</span> Para carregar os dados reais da aba Tutores, certifique-se de que a planilha está publicada na web (Arquivo > Compartilhar > Publicar na web > Aba Tutores > CSV).
+                </div>
+            </div>
+            <button onclick="document.getElementById('help-banner').style.display='none'" class="text-indigo-500 hover:text-indigo-700 font-medium">Dispensar</button>
+        </div>
+
         <!-- Cards de Estatísticas da Aba Tutores -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
@@ -82,7 +93,6 @@
             </div>
         </div>
 
-        <!-- Gráficos -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
                 <div class="flex justify-between items-center mb-4">
@@ -105,7 +115,6 @@
             </div>
         </div>
 
-        <!-- Tabela de Dados e Filtros -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <h3 class="font-bold text-slate-900">Lista de Tutores (Aba Tutores)</h3>
@@ -141,7 +150,6 @@
 
     </main>
 
-    <!-- Modal Adicionar / Editar -->
     <div id="dataModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
             <div class="flex justify-between items-center">
@@ -179,15 +187,12 @@
         </div>
     </div>
 
-    <!-- Mensagem flutuante para avisos -->
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl text-xs shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
         <i class="fa-solid fa-circle-check text-emerald-400"></i>
         <span id="toastMessage">Dados atualizados com sucesso!</span>
     </div>
 
     <script>
-        // URL da planilha pública ajustada para a aba específica ou geral
-        // Nota: Para especificar uma aba exata por ID no Google Sheets, usa-se gid=NUMERO_DA_ABA
         const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1PrRumrefWCuLZm2HA7NXDJJfc6JO7d42gshjovaKXaI/export?format=csv&gid=1016272586";
 
         let dbData = [
