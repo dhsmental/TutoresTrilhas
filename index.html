@@ -33,9 +33,6 @@
                 <span id="sync-status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-100 border border-emerald-400/30">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Ao vivo / Sincronizado
                 </span>
-                <button onclick="openConfigModal()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-3 py-2 rounded-xl text-xs font-medium transition shadow flex items-center gap-2 cursor-pointer" title="Configurar URL do Apps Script">
-                    <i class="fa-solid fa-gear"></i> Configurar URL
-                </button>
                 <button onclick="refreshData()" class="bg-indigo-800 hover:bg-indigo-900 text-white px-3.5 py-2 rounded-xl text-xs font-medium transition shadow flex items-center gap-2 cursor-pointer">
                     <i class="fa-solid fa-rotate"></i> Atualizar
                 </button>
@@ -45,17 +42,6 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
         
-        <!-- Banner de Ajuda / Configuração Inicial -->
-        <div id="help-banner" class="bg-indigo-50 border border-indigo-200 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-indigo-900">
-            <div class="flex items-center gap-3">
-                <i class="fa-solid fa-circle-info text-indigo-600 text-base"></i>
-                <div>
-                    <span class="font-semibold">Primeiro acesso:</span> Insira a URL do seu Google Apps Script clicando em <button onclick="openConfigModal()" class="underline font-bold text-indigo-700 cursor-pointer">Configurar URL</button> para puxar os dados reais da aba Tutores automaticamente.
-                </div>
-            </div>
-            <button onclick="document.getElementById('help-banner').style.display='none'" class="text-indigo-500 hover:text-indigo-700 font-medium">Dispensar</button>
-        </div>
-
         <!-- Cards de Estatísticas da Aba Tutores -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
@@ -96,36 +82,26 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 gap-6">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-bold text-slate-900">Capacidade / Alunos por Tutor</h3>
                     <span class="text-xs text-slate-400">Aba Tutores</span>
                 </div>
-                <div class="relative h-72">
+                <div class="relative h-80">
                     <canvas id="chartTutoresAlunos"></canvas>
-                </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-slate-900">Status dos Tutores</h3>
-                    <span class="text-xs text-slate-400">Distribuição</span>
-                </div>
-                <div class="relative h-72 flex justify-center">
-                    <canvas id="chartStatusTutores"></canvas>
                 </div>
             </div>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <h3 class="font-bold text-slate-900">Lista de Tutores (Aba Tutores)</h3>
+                <h3 class="font-bold text-slate-900">Lista Completa de Tutores (Aba Tutores)</h3>
                 
                 <div class="flex items-center gap-3 w-full sm:w-auto">
                     <div class="relative flex-grow sm:w-64">
                         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                        <input type="text" id="searchInput" oninput="filterTable()" placeholder="Buscar tutor ou especialidade..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
+                        <input type="text" id="searchInput" oninput="filterTable()" placeholder="Buscar tutor..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
                     </div>
                 </div>
             </div>
@@ -133,11 +109,8 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
-                        <tr class="bg-slate-50 text-slate-500 border-b border-slate-100 uppercase font-semibold">
-                            <th class="p-4">Nome do Tutor</th>
-                            <th class="p-4">Especialidade / Área</th>
-                            <th class="p-4">Qtd Alunos Atribuídos</th>
-                            <th class="p-4">Status</th>
+                        <tr id="tableHeaderRow" class="bg-slate-50 text-slate-500 border-b border-slate-100 uppercase font-semibold">
+                            <!-- Cabeçalhos gerados dinamicamente na ordem exata da planilha -->
                         </tr>
                     </thead>
                     <tbody id="dataTableBody" class="divide-y divide-slate-100 text-slate-700">
@@ -149,26 +122,6 @@
 
     </main>
 
-    <!-- Modal de Configuração da URL -->
-    <div id="configModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl space-y-4">
-            <div class="flex justify-between items-center">
-                <h3 class="font-bold text-slate-900 text-base">Configurar Conexão com a Planilha</h3>
-                <button onclick="closeConfigModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            <div class="space-y-3 text-xs">
-                <p class="text-slate-600">Cole abaixo a <strong>URL do Aplicativo da Web</strong> gerada no Google Apps Script:</p>
-                <input type="text" id="inputScriptUrl" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 font-mono text-slate-700" placeholder="https://script.google.com/macros/s/.../exec">
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeConfigModal()" class="px-4 py-2 rounded-xl text-xs font-medium border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer">Cancelar</button>
-                <button onclick="saveScriptUrl()" class="px-4 py-2 rounded-xl text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer">Salvar e Conectar</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Toast de Notificação -->
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl text-xs shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
         <i class="fa-solid fa-circle-check text-emerald-400"></i>
@@ -176,62 +129,23 @@
     </div>
 
     <script>
-        let scriptUrl = localStorage.getItem('tutor_script_url') || "";
+        // URL fixa do Apps Script informada
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbzbSe8OY2Do4ZA3BOo3lst03S8lHiupSYVKCjoFRgggoTbGUDakcKFnmz2O6fGY1CXuBQ/exec";
         let dbData = [];
+        let columnKeys = [];
 
         let chartTutoresAlunosInstance = null;
-        let chartStatusTutoresInstance = null;
 
         window.onload = function() {
-            if (scriptUrl) {
-                document.getElementById('help-banner').style.display = 'none';
-                fetchDataFromAppsScript();
-            } else {
-                // Dados de demonstração iniciais caso não tenha configurado
-                dbData = [
-                    { id: 1, nome: "Exemplo: Profa. Ana", especialidade: "Matemática", alunosCount: 12, status: "Ativo" },
-                    { id: 2, nome: "Exemplo: Prof. Carlos", especialidade: "História", alunosCount: 8, status: "Ativo" }
-                ];
-                renderDashboard();
-            }
+            fetchDataFromAppsScript();
 
-            // Atualização automática a cada 30 segundos se houver URL configurada
+            // Atualização automática a cada 30 segundos
             setInterval(() => {
-                if(scriptUrl) fetchDataFromAppsScript(true);
+                fetchDataFromAppsScript(true);
             }, 30000);
         };
 
-        function openConfigModal() {
-            document.getElementById('inputScriptUrl').value = scriptUrl;
-            document.getElementById('configModal').classList.remove('hidden');
-            document.getElementById('configModal').classList.add('flex');
-        }
-
-        function closeConfigModal() {
-            document.getElementById('configModal').classList.remove('flex');
-            document.getElementById('configModal').classList.add('hidden');
-        }
-
-        function saveScriptUrl() {
-            const url = document.getElementById('inputScriptUrl').value.trim();
-            if(!url) {
-                showToast("https://script.google.com/macros/s/AKfycbzbSe8OY2Do4ZA3BOo3lst03S8lHiupSYVKCjoFRgggoTbGUDakcKFnmz2O6fGY1CXuBQ/exec", true);
-                return;
-            }
-            scriptUrl = url;
-            localStorage.setItem('tutor_script_url', scriptUrl);
-            closeConfigModal();
-            document.getElementById('help-banner').style.display = 'none';
-            fetchDataFromAppsScript();
-            showToast("URL salva com sucesso!");
-        }
-
         async function fetchDataFromAppsScript(isBackground = false) {
-            if (!scriptUrl) {
-                if(!isBackground) openConfigModal();
-                return;
-            }
-
             try {
                 if(!isBackground) showToast("Buscando dados da aba Tutores...");
                 
@@ -244,8 +158,11 @@
                     throw new Error(data.error);
                 }
 
-                if (Array.isArray(data)) {
+                if (Array.isArray(data) && data.length > 0) {
                     dbData = data;
+                    // Mantém todas as colunas na ordem exata retornada pela planilha (ignorando apenas o id interno)
+                    columnKeys = Object.keys(data[0]).filter(k => k !== 'id');
+                    
                     renderDashboard();
                     if(!isBackground) showToast("Dados sincronizados com sucesso!");
                 }
@@ -263,46 +180,78 @@
 
         function updateMetrics() {
             const totalTutores = dbData.length;
-            const ativos = dbData.filter(item => item.status === 'Ativo').length;
-            const totalAlunos = dbData.reduce((acc, item) => acc + item.alunosCount, 0);
-            const mediaAlunos = totalTutores > 0 ? (totalAlunos / totalTutores).toFixed(1) : 0;
+            const ativos = dbData.filter(item => {
+                const values = Object.values(item).join(' ').toLowerCase();
+                return values.includes('ativo');
+            }).length;
+
+            let totalAlunos = 0;
+            dbData.forEach(item => {
+                for(let key in item) {
+                    if(typeof item[key] === 'number' && key.toLowerCase().includes('aluno')) {
+                        totalAlunos += item[key];
+                    }
+                }
+            });
+
+            const mediaAlunos = totalTutores > 0 && totalAlunos > 0 ? (totalAlunos / totalTutores).toFixed(1) : 0;
 
             document.getElementById('stat-total-tutores').innerText = totalTutores;
-            document.getElementById('stat-tutores-ativos').innerText = ativos;
+            document.getElementById('stat-tutores-ativos').innerText = ativos > 0 ? ativos : totalTutores;
             document.getElementById('stat-media-alunos').innerText = mediaAlunos;
         }
 
         function renderTable(data) {
+            const headerRow = document.getElementById('tableHeaderRow');
             const tbody = document.getElementById('dataTableBody');
+            
+            headerRow.innerHTML = '';
             tbody.innerHTML = '';
 
-            if(data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400">Nenhum tutor encontrado nesta aba.</td></tr>`;
+            if(columnKeys.length === 0 && data.length > 0) {
+                columnKeys = Object.keys(data[0]).filter(k => k !== 'id');
+            }
+
+            if(columnKeys.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400">Nenhum dado encontrado nesta aba.</td></tr>`;
                 return;
             }
 
-            data.forEach(item => {
-                let badgeColor = "bg-emerald-50 text-emerald-700 border-emerald-200";
-                if(item.status === 'Inativo') badgeColor = "bg-rose-50 text-rose-700 border-rose-200";
-                if(item.status === 'Férias') badgeColor = "bg-amber-50 text-amber-700 border-amber-200";
+            // Renderiza os cabeçalhos na ordem exata da planilha
+            columnKeys.forEach(key => {
+                const th = document.createElement('th');
+                th.className = "p-4 capitalize";
+                th.innerText = key.replace(/([A-Z])/g, ' $1');
+                headerRow.appendChild(th);
+            });
 
+            if(data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${columnKeys.length}" class="p-6 text-center text-slate-400">Nenhum resultado encontrado.</td></tr>`;
+                return;
+            }
+
+            // Renderiza as linhas preenchendo cada coluna sequencialmente
+            data.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50/50 transition";
-                tr.innerHTML = `
-                    <td class="p-4 font-medium text-slate-900">${item.nome}</td>
-                    <td class="p-4">${item.especialidade}</td>
-                    <td class="p-4 font-semibold text-indigo-600">${item.alunosCount} alunos</td>
-                    <td class="p-4">
-                        <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold border ${badgeColor}">${item.status}</span>
-                    </td>
-                `;
+                
+                let rowHtml = '';
+                columnKeys.forEach(key => {
+                    let val = item[key] !== undefined && item[key] !== null ? item[key] : '';
+                    rowHtml += `<td class="p-4 font-medium text-slate-900">${val}</td>`;
+                });
+                
+                tr.innerHTML = rowHtml;
                 tbody.appendChild(tr);
             });
         }
 
         function renderCharts() {
-            const tutorLabels = dbData.map(item => item.nome);
-            const tutorValues = dbData.map(item => item.alunosCount);
+            let nameKey = columnKeys.find(k => k.toLowerCase().includes('nome')) || columnKeys[0];
+            let valueKey = columnKeys.find(k => typeof dbData[0][k] === 'number') || columnKeys[1];
+
+            const tutorLabels = dbData.map(item => item[nameKey] || 'Tutor');
+            const tutorValues = dbData.map(item => Number(item[valueKey]) || 0);
 
             const ctxTutoresAlunos = document.getElementById('chartTutoresAlunos').getContext('2d');
             if(chartTutoresAlunosInstance) chartTutoresAlunosInstance.destroy();
@@ -312,7 +261,7 @@
                 data: {
                     labels: tutorLabels,
                     datasets: [{
-                        label: 'Alunos Atribuídos',
+                        label: valueKey ? valueKey : 'Valor',
                         data: tutorValues,
                         backgroundColor: '#8b5cf6',
                         borderRadius: 8,
@@ -329,42 +278,13 @@
                     }
                 }
             });
-
-            const statusCounts = { Ativo: 0, Inativo: 0, Férias: 0 };
-            dbData.forEach(item => {
-                if(statusCounts[item.status] !== undefined) statusCounts[item.status]++;
-            });
-
-            const ctxStatus = document.getElementById('chartStatusTutores').getContext('2d');
-            if(chartStatusTutoresInstance) chartStatusTutoresInstance.destroy();
-
-            chartStatusTutoresInstance = new Chart(ctxStatus, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Ativo', 'Inativo', 'Férias'],
-                    datasets: [{
-                        data: [statusCounts['Ativo'], statusCounts['Inativo'], statusCounts['Férias']],
-                        backgroundColor: ['#10b981', '#f43f5e', '#f59e0b'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Inter', size: 11 } } }
-                    },
-                    cutout: '70%'
-                }
-            });
         }
 
         function filterTable() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = dbData.filter(item => 
-                item.nome.toLowerCase().includes(query) || 
-                item.especialidade.toLowerCase().includes(query)
-            );
+            const filtered = dbData.filter(item => {
+                return Object.values(item).some(val => String(val).toLowerCase().includes(query));
+            });
             renderTable(filtered);
         }
 
