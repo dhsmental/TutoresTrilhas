@@ -26,7 +26,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-tight">Dashboard de Tutores (Aba Tutores)</h1>
-                    <p class="text-xs text-indigo-200">Sincronizado via Google Apps Script (Colunas A a M)</p>
+                    <p class="text-xs text-indigo-200">Sincronizado via Google Apps Script</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -62,7 +62,7 @@
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Colunas Carregadas</p>
                     <h3 id="stat-total-colunas" class="text-2xl font-bold text-slate-900 mt-1">0</h3>
                     <span class="text-xs text-emerald-600 font-medium flex items-center gap-1 mt-1">
-                        <i class="fa-solid fa-table-columns"></i> Da coluna A em diante
+                        <i class="fa-solid fa-table-columns"></i> Mapeadas da planilha
                     </span>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
@@ -93,15 +93,15 @@
             </div>
         </div>
 
-        <!-- Tabela Completa Dinâmica -->
+        <!-- Tabela Completa Dinâmica com Filtros por Coluna -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <h3 class="font-bold text-slate-900">Planilha Completa (Colunas A até M)</h3>
+                <h3 class="font-bold text-slate-900">Planilha Completa de Tutores</h3>
                 
                 <div class="flex items-center gap-3 w-full sm:w-auto">
                     <div class="relative flex-grow sm:w-64">
                         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                        <input type="text" id="searchInput" oninput="filterTable()" placeholder="Buscar em qualquer coluna..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
+                        <input type="text" id="globalSearchInput" oninput="filterTable()" placeholder="Buscar globalmente..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
                     </div>
                 </div>
             </div>
@@ -110,7 +110,10 @@
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
                         <tr id="tableHeaderRow" class="bg-slate-50 text-slate-500 border-b border-slate-100 uppercase font-semibold">
-                            <!-- Preenchido dinamicamente com os cabeçalhos reais da planilha -->
+                            <!-- Preenchido dinamicamente com os cabeçalhos -->
+                        </tr>
+                        <tr id="tableFilterRow" class="bg-slate-100/70 border-b border-slate-200">
+                            <!-- Inputs de filtro por coluna -->
                         </tr>
                     </thead>
                     <tbody id="dataTableBody" class="divide-y divide-slate-100 text-slate-700">
@@ -170,7 +173,7 @@
 
         function renderDashboard() {
             updateMetrics();
-            renderTableHeaders();
+            renderTableHeadersAndFilters();
             renderTable(tableData);
             renderChart();
         }
@@ -180,14 +183,34 @@
             document.getElementById('stat-total-colunas').innerText = tableHeaders.length;
         }
 
-        function renderTableHeaders() {
+        function renderTableHeadersAndFilters() {
             const headerRow = document.getElementById('tableHeaderRow');
+            const filterRow = document.getElementById('tableFilterRow');
+            
             headerRow.innerHTML = '';
-            tableHeaders.forEach(header => {
+            filterRow.innerHTML = '';
+
+            tableHeaders.forEach((header, index) => {
+                // Cabeçalho
                 const th = document.createElement('th');
-                th.className = "p-4 whitespace-nowrap";
+                th.className = "p-3 whitespace-nowrap";
                 th.innerText = header;
                 headerRow.appendChild(th);
+
+                // Linha de Filtro por Coluna
+                const thFilter = document.createElement('th');
+                thFilter.className = "p-2 whitespace-nowrap";
+                
+                const input = document.createElement('input');
+                input.type = "text";
+                input.placeholder = `Filtrar ${header}...`;
+                input.className = "w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-[11px] focus:outline-none focus:border-indigo-500 font-normal";
+                input.dataset.columnIndex = index;
+                input.dataset.headerName = header;
+                input.oninput = filterTable;
+                
+                thFilter.appendChild(input);
+                filterRow.appendChild(thFilter);
             });
         }
 
@@ -206,8 +229,35 @@
                 
                 tableHeaders.forEach(header => {
                     const td = document.createElement('td');
-                    td.className = "p-4 whitespace-nowrap text-slate-700";
-                    td.innerText = rowObj[header] !== undefined && rowObj[header] !== null ? rowObj[header] : "";
+                    td.className = "p-3 whitespace-nowrap text-slate-700";
+                    
+                    let cellValue = rowObj[header] !== undefined && rowObj[header] !== null ? String(rowObj[header]) : "";
+                    
+                    // Verifica se a coluna é "produtos de trilha" (ignorando maiúsculas/minúsculas e acentos)
+                    const normalizedHeader = header.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    const isTrilhaCol = normalizedHeader.includes("produto") && normalizedHeader.includes("trilha");
+
+                    if (isTrilhaCol) {
+                        const valLower = cellValue.toLowerCase().trim();
+                        let badgeClass = "";
+                        
+                        if (valLower === "entregue") {
+                            badgeClass = "bg-emerald-600 text-white px-2.5 py-1 rounded-md font-medium text-[11px] inline-block";
+                        } else if (valLower === "nao entregue") {
+                            badgeClass = "bg-amber-500 text-white px-2.5 py-1 rounded-md font-medium text-[11px] inline-block";
+                        } else if (valLower === "nao disponivel" || valLower === "não disponível") {
+                            badgeClass = "bg-slate-500 text-white px-2.5 py-1 rounded-md font-medium text-[11px] inline-block";
+                        }
+
+                        if (badgeClass) {
+                            td.innerHTML = `<span class="${badgeClass}">${cellValue}</span>`;
+                        } else {
+                            td.innerText = cellValue;
+                        }
+                    } else {
+                        td.innerText = cellValue;
+                    }
+
                     tr.appendChild(td);
                 });
                 
@@ -219,21 +269,18 @@
             const ctx = document.getElementById('chartTutoresAlunos').getContext('2d');
             if(chartInstance) chartInstance.destroy();
 
-            // Pega os primeiros 10 registros e tenta achar uma coluna numérica ou usa o índice para demonstrar o volume
             const labels = tableData.slice(0, 15).map((row, index) => {
-                // Tenta usar a primeira coluna como rótulo (ex: Nome)
                 return String(row[tableHeaders[0]] || `Item ${index + 1}`);
             });
 
-            const values = tableData.slice(0, 15).map((row, index) => {
-                // Procura a primeira coluna que pareça conter números ou quantidade
+            const values = tableData.slice(0, 15).map((row) => {
                 for(let key of tableHeaders) {
                     let val = Number(row[key]);
                     if(!isNaN(val) && val > 0 && key.toLowerCase() !== 'id') {
                         return val;
                     }
                 }
-                return 1; // Fallback
+                return 1;
             });
 
             chartInstance = new Chart(ctx, {
@@ -261,13 +308,42 @@
         }
 
         function filterTable() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = tableData.filter(rowObj => {
-                return tableHeaders.some(header => {
-                    let val = String(rowObj[header] || "").toLowerCase();
-                    return val.includes(query);
-                });
+            const globalQuery = document.getElementById('globalSearchInput').value.toLowerCase();
+            const filterInputs = document.querySelectorAll('#tableFilterRow input');
+            
+            // Coleta os valores de cada filtro por coluna
+            const columnFilters = {};
+            filterInputs.forEach(input => {
+                const header = input.dataset.headerName;
+                columnFilters[header] = input.value.toLowerCase();
             });
+
+            const filtered = tableData.filter(rowObj => {
+                // 1. Valida o filtro global
+                let matchesGlobal = true;
+                if (globalQuery) {
+                    matchesGlobal = tableHeaders.some(header => {
+                        let val = String(rowObj[header] || "").toLowerCase();
+                        return val.includes(globalQuery);
+                    });
+                }
+
+                if (!matchesGlobal) return false;
+
+                // 2. Valida os filtros individuais de cada coluna
+                for (let header of tableHeaders) {
+                    const filterVal = columnFilters[header];
+                    if (filterVal) {
+                        let cellVal = String(rowObj[header] || "").toLowerCase();
+                        if (!cellVal.includes(filterVal)) {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            });
+
             renderTable(filtered);
         }
 
