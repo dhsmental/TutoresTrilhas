@@ -23,16 +23,27 @@
             background-color: #f8fafc;
         }
         
-        /* Estilos exclusivos para o Card A4 */
+        /* Força o navegador a imprimir cores de fundo e gráficos */
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Estilos exclusivos para o Card A4 otimizado para preencher exatamente a página */
         .page-a4 {
             width: 100%;
             max-width: 210mm;
             min-height: 297mm;
+            max-height: 297mm;
             margin: 0 auto;
             background: #ffffff;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            padding: 4mm 6mm;
+            padding: 3mm 5mm;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
         }
 
         @media print {
@@ -52,9 +63,11 @@
                 top: 0 !important;
                 width: 210mm !important;
                 height: 297mm !important;
+                max-height: 297mm !important;
                 box-shadow: none !important;
                 margin: 0 !important;
-                padding: 4mm 6mm !important;
+                padding: 3mm 5mm !important;
+                overflow: hidden !important;
             }
             .no-print {
                 display: none !important;
@@ -68,16 +81,16 @@
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
             <div class="flex items-center gap-3">
                 <div class="bg-indigo-700 p-2 rounded-xl shadow-inner">
-                    <i class="fa-solid fa-chalkboard-user text-xl"></i>
+                    
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold tracking-tight">Dashboard de Tutores & Card A4</h1>
-                    <p class="text-xs text-indigo-200">Sincronizado via Google Apps Script</p>
+                    <h1 class="text-lg font-bold tracking-tight">Dados Tutores , Atividades e Card A4</h1>
+                    
                 </div>
             </div>
             <div class="flex items-center gap-3">
                 <div class="flex bg-indigo-800 p-1 rounded-xl text-xs font-semibold">
-                    <button onclick="switchTab('dashboard')" id="btnTabDashboard" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition cursor-pointer">Planilha / Dashboard</button>
+                    <button onclick="switchTab('dashboard')" id="btnTabDashboard" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition cursor-pointer">Planilha </button>
                     <button onclick="switchTab('a4')" id="btnTabA4" class="px-3 py-1.5 rounded-lg text-indigo-200 hover:text-white transition cursor-pointer">Visualizar Card A4</button>
                 </div>
                 <button onclick="refreshData()" class="bg-indigo-900 hover:bg-indigo-950 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow flex items-center gap-2 cursor-pointer">
@@ -94,7 +107,7 @@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col flex-grow overflow-hidden">
                 <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4 flex-shrink-0">
                     <div class="flex items-center gap-2">
-                        <h3 class="font-bold text-slate-900">Planilha Completa de Tutores (Colunas A - Q)</h3>
+                        <h3 class="font-bold text-slate-900">Planilha Completa de Tutores </h3>
                         <span id="stat-total-tutores" class="bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full text-xs font-semibold">0 registros</span>
                     </div>
                     
@@ -131,53 +144,73 @@
             </div>
 
             <div class="page-a4 border border-slate-300 rounded-lg">
-                <!-- Imagem de Banner -->
-                <div class="w-full mb-2 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
-                    <img src="banner.jpg" alt="Banner do Curso" class="w-full h-auto block object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/800x150/0f172a/ffffff?text=Banner+Educacao+em+Direitos+Humanos';">
-                </div>
-
-                <div class="border-b-2 border-slate-800 pb-1 mb-2 text-center">
-                    <h2 class="text-base font-black text-slate-900 uppercase tracking-tight">Quadro Consolidado de Resultados</h2>
-                </div>
-
-                <!-- Tabelas em Duas Colunas -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <table class="w-full text-left text-[9.5px] border-collapse">
-                            <thead>
-                                <tr class="bg-slate-800 text-white font-bold uppercase text-[8.5px]">
-                                    <th class="py-0.5 px-1 w-5 text-center">#</th>
-                                    <th class="py-0.5 px-1">Tutor</th>
-                                    <th class="py-0.5 px-1 text-center">A. T 1</th>
-                                    <th class="py-0.5 px-1 text-center">%C / T1</th>
-                                    <th class="py-0.5 px-1 text-center">A. T 2</th>
-                                    <th class="py-0.5 px-1 text-center">%C / T2</th>
-                                </tr>
-                            </thead>
-                            <tbody id="a4Column1" class="divide-y divide-slate-200 border-b border-slate-200"></tbody>
-                        </table>
+                <div>
+                    <!-- Imagem de Banner -->
+                    <div class="w-full mb-2 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
+                        <img src="banner.jpg" alt="Banner do Curso" class="w-full h-auto block object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/800x150/0f172a/ffffff?text=Banner+Educacao+em+Direitos+Humanos';">
                     </div>
 
-                    <div>
-                        <table class="w-full text-left text-[9.5px] border-collapse">
-                            <thead>
-                                <tr class="bg-slate-800 text-white font-bold uppercase text-[8.5px]">
-                                    <th class="py-0.5 px-1 w-5 text-center">#</th>
-                                    <th class="py-0.5 px-1">Tutor</th>
-                                    <th class="py-0.5 px-1 text-center">A. T 1</th>
-                                    <th class="py-0.5 px-1 text-center">%C / T1</th>
-                                    <th class="py-0.5 px-1 text-center">A. T 2</th>
-                                    <th class="py-0.5 px-1 text-center">%C / T2</th>
-                                </tr>
-                            </thead>
-                            <tbody id="a4Column2" class="divide-y divide-slate-200 border-b border-slate-200"></tbody>
-                        </table>
+                    <div class="border-b-2 border-slate-800 pb-1 mb-2 text-center">
+                        <h2 class="text-sm font-black text-slate-900 uppercase tracking-tight">Quadro Consolidado de Resultados</h2>
+                    </div>
+
+                    <!-- Tabelas em Duas Colunas com preenchimento milimétrico ajustado -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <table class="w-full text-left text-[9.5px] border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-800 text-white font-bold uppercase text-[8px]">
+                                        <th class="py-1 px-1 w-5 text-center">#</th>
+                                        <th class="py-1 px-1.5">Tutor</th>
+                                        <th class="py-1 px-0.5 text-center bg-blue-900 text-white">A. T 1</th>
+                                        <th class="py-1 px-0.5 text-center bg-emerald-900 text-white">%C / T1</th>
+                                        <th class="py-1 px-0.5 text-center bg-purple-900 text-white">A. T 2</th>
+                                        <th class="py-1 px-0.5 text-center bg-amber-900 text-white">%C / T2</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="a4Column1" class="divide-y divide-slate-200 border-b border-slate-200"></tbody>
+                            </table>
+                        </div>
+
+                        <div>
+                            <table class="w-full text-left text-[9.5px] border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-800 text-white font-bold uppercase text-[8px]">
+                                        <th class="py-1 px-1 w-5 text-center">#</th>
+                                        <th class="py-1 px-1.5">Tutor</th>
+                                        <th class="py-1 px-0.5 text-center bg-blue-900 text-white">A. T 1</th>
+                                        <th class="py-1 px-0.5 text-center bg-emerald-900 text-white">%C / T1</th>
+                                        <th class="py-1 px-0.5 text-center bg-purple-900 text-white">A. T 2</th>
+                                        <th class="py-1 px-0.5 text-center bg-amber-900 text-white">%C / T2</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="a4Column2" class="divide-y divide-slate-200 border-b border-slate-200"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
-                <div class="mt-2 pt-1 border-t border-slate-300 flex justify-between items-center text-[9px] text-slate-500">
-                    <span>Relatório extraído da aba Tutores via Web App[cite: 6].</span>
-                    <span>Página 1 de 1</span>
+                <!-- Legenda Explicativa das Colunas com Cores Correspondentes -->
+                <div class="mt-2 pt-1.5 border-t border-slate-300">
+                    <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-[8.5px] text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-200 mb-1">
+                        <div class="flex items-center gap-1.5">
+                            <span class="inline-block w-3 h-3 bg-blue-100 border border-blue-300 rounded-sm flex-shrink-0"></span>
+                            <span class="truncate"><strong class="text-blue-900">A. T 1:</strong> Atividades Tutor Trilha 1</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="inline-block w-3 h-3 bg-purple-100 border border-purple-300 rounded-sm flex-shrink-0"></span>
+                            <span class="truncate"><strong class="text-purple-900">A. T 2:</strong> Atividades Tutor Trilha 2</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="inline-block w-3 h-3 bg-emerald-100 border border-emerald-300 rounded-sm flex-shrink-0"></span>
+                            <span class="truncate"><strong class="text-emerald-900">%C / T1:</strong> Porcentagem de entrega de Cursista por Tutor Trilha 1</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="inline-block w-3 h-3 bg-amber-100 border border-amber-300 rounded-sm flex-shrink-0"></span>
+                            <span class="truncate"><strong class="text-amber-900">%C / T2:</strong> Porcentagem de entrega de Cursista por Tutor Trilha 2</span>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -281,15 +314,13 @@
 
         function getConditionalColorStyle(percentVal) {
             if (percentVal <= 33) {
-                return "background-color: #ef4444; color: #ffffff; font-weight: 600;";
+                return "background-color: #fee2e2; color: #991b1b; font-weight: 600;";
             } else if (percentVal <= 50) {
-                return "background-color: #f97316; color: #ffffff; font-weight: 600;";
-            } else if (percentVal <= 66) {
-                return "background-color: #facc15; color: #1e293b; font-weight: 600;";
-            } else if (percentVal <= 85) {
-                return "background-color: #a3e635; color: #1e293b; font-weight: 600;";
+                return "background-color: #ffedd5; color: #9a3412; font-weight: 600;";
+            } else if (percentVal <= 75) {
+                return "background-color: #fef08a; color: #854d0e; font-weight: 600;";
             } else {
-                return "background-color: #10b981; color: #ffffff; font-weight: 600;";
+                return "background-color: #dcfce7; color: #166534; font-weight: 600;";
             }
         }
 
@@ -455,7 +486,7 @@
             let formattedPercent = percentVal.toFixed(2).replace('.', ',') + '%';
             let styleAttr = getConditionalColorStyle(percentVal);
 
-            return `<span style="${styleAttr} padding: 1px 4px; border-radius: 2px; display: inline-block; text-align: center; font-size: 8.5px; line-height: 1.1;">${formattedPercent}</span>`;
+            return `<span style="${styleAttr} padding: 1.5px 4px; border-radius: 2px; display: inline-block; text-align: center; font-size: 8.5px; line-height: 1.1;">${formattedPercent}</span>`;
         }
 
         function renderA4Content() {
@@ -487,12 +518,12 @@
                 const pcT2 = formatarPercentualCardA4(rowObj[hQ]);
 
                 tr.innerHTML = `
-                    <td class="py-0.5 px-1 text-center font-mono text-[8.5px] text-slate-400 border-r border-slate-100">${index + 1}</td>
-                    <td class="py-0.5 px-1 font-medium text-slate-800 truncate max-w-[85px]" title="${rawName}">${nameVal}</td>
-                    <td class="py-0.5 px-1 text-center font-bold text-slate-700 border-l border-slate-100">${at1}</td>
-                    <td class="py-0.5 px-1 text-center border-l border-slate-100">${pcT1}</td>
-                    <td class="py-0.5 px-1 text-center font-bold text-slate-700 border-l border-slate-100">${at2}</td>
-                    <td class="py-0.5 px-1 text-center border-l border-slate-100">${pcT2}</td>
+                    <td class="py-[3.8px] px-1 text-center font-mono text-[8.5px] text-slate-400 border-r border-slate-100">${index + 1}</td>
+                    <td class="py-[3.8px] px-1.5 font-medium text-slate-800 truncate max-w-[100px]" title="${rawName}">${nameVal}</td>
+                    <td class="py-[3.8px] px-0.5 text-center font-bold text-blue-900 bg-blue-50/50 border-l border-slate-100">${at1}</td>
+                    <td class="py-[3.8px] px-0.5 text-center bg-emerald-50/40 border-l border-slate-100">${pcT1}</td>
+                    <td class="py-[3.8px] px-0.5 text-center font-bold text-purple-900 bg-purple-50/50 border-l border-slate-100">${at2}</td>
+                    <td class="py-[3.8px] px-0.5 text-center bg-amber-50/40 border-l border-slate-100">${pcT2}</td>
                 `;
                 return tr;
             };
