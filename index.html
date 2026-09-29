@@ -3,380 +3,808 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Tutores e Alunos</title>
+    <title>Dashboard Tutores & Cursistas - Direitos Humanos e Saúde Mental</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome para ícones -->
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .table-container {
-            max-height: calc(100vh - 200px);
-            overflow-y: auto;
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
         }
-        .table-container thead th {
-            position: sticky;
-            top: 0;
-            z-index: 20;
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        .page-a4 {
+            width: 100%;
+            max-width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 4mm 6mm;
+            box-sizing: border-box;
+        }
+
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+            html, body {
+                width: 210mm;
+                height: 297mm;
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+            }
+            body * {
+                visibility: hidden !important;
+            }
+            .page-a4, .page-a4 * {
+                visibility: visible !important;
+            }
+            .page-a4 {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                max-width: none !important;
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 4mm 6mm 12mm 6mm !important; 
+                box-sizing: border-box !important;
+                overflow: hidden !important;
+                transform: scale(0.99) !important;
+                transform-origin: top left !important;
+            }
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 h-screen flex flex-col overflow-hidden">
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
-    <header class="bg-indigo-600 text-white shadow-md flex-shrink-0">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
-            <div class="flex items-center gap-3">
-                <div class="bg-indigo-700 p-2 rounded-xl shadow-inner">
-                    <i class="fa-solid fa-chalkboard-user text-xl"></i>
+    <!-- Header -->
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2.5 bg-emerald-600 rounded-xl text-white shadow-lg shadow-emerald-900/50">
+                        <i class="fa-solid fa-user-graduate text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white">Gestão de Tutores & Cursistas</h1>
+                            <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs px-2.5 py-0.5 rounded-full font-medium">Moodle</span>
+                        </div>
+                        <p class="text-slate-400 text-xs sm:text-sm mt-0.5">Curso de Direitos Humanos e Saúde Mental • Atualizado até 29/09/2026</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-lg font-bold tracking-tight">Dashboard de Tutores (Aba Tutores)</h1>
-                    <p class="text-xs text-indigo-200">Sincronizado via Google Apps Script</p>
+
+                <div class="flex items-center gap-2 no-print self-start md:self-auto">
+                    <button onclick="window.print()" class="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition shadow-sm shadow-emerald-900/30">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Imprimir A4</span>
+                    </button>
                 </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <span id="sync-status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-100 border border-emerald-400/30">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Ao vivo / Sincronizado
-                </span>
-                <button onclick="refreshData()" class="bg-indigo-800 hover:bg-indigo-900 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow flex items-center gap-2 cursor-pointer">
-                    <i class="fa-solid fa-rotate"></i> Atualizar
-                </button>
             </div>
         </div>
     </header>
 
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-4 flex flex-col overflow-hidden">
-        
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col flex-grow overflow-hidden">
-            <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4 flex-shrink-0">
-                <div class="flex items-center gap-2">
-                    <h3 class="font-bold text-slate-900">Planilha Completa de Tutores</h3>
-                    <span id="stat-total-tutores" class="bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full text-xs font-semibold">0 registros</span>
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- KPI Cards Section -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 no-print">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                <div class="flex items-center justify-between text-slate-500 mb-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Total Tutores</span>
                 </div>
-                
-                <div class="flex items-center gap-3 w-full sm:w-auto">
-                    <div class="relative flex-grow sm:w-64">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-slate-400 text-xs"></i>
-                        <input type="text" id="globalSearchInput" oninput="filterTable()" placeholder="Buscar globalmente..." class="w-full pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-indigo-500">
-                    </div>
+                <div class="flex items-baseline justify-between">
+                    <span class="text-3xl font-extrabold text-slate-900" id="kpi-tutores">70</span>
+                    <span class="text-xs font-medium text-slate-500">Equipe ativa</span>
+                </div>
+                <div class="mt-3 text-xs text-slate-500 border-t border-slate-100 pt-2 flex justify-between">
+                    <span>Média por tutor:</span>
+                    <span class="font-semibold text-slate-700">61 cursistas</span>
                 </div>
             </div>
 
-            <div class="table-container overflow-x-auto flex-grow relative">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead>
-                        <tr id="tableHeaderRow" class="bg-slate-50 text-slate-500 border-b border-slate-200 uppercase font-semibold shadow-sm">
-                            <!-- Preenchido dinamicamente -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                <div class="flex items-center justify-between text-slate-500 mb-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Base Cursistas</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                    <span class="text-3xl font-extrabold text-slate-900" id="kpi-total">4.297</span>
+                    <span class="text-xs font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">Total Geral</span>
+                </div>
+                <div class="mt-3 text-xs text-slate-500 border-t border-slate-100 pt-2 flex justify-between">
+                    <span>Total Inscritos:</span>
+                    <span class="font-semibold text-slate-700">4.297 alunos</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition border-l-4 border-l-cyan-500">
+                <div class="flex items-center justify-between text-slate-500 mb-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Ativos no Moodle</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                    <span class="text-3xl font-extrabold text-cyan-600" id="kpi-ativos">2.243</span>
+                    <span class="text-xs font-bold text-cyan-700 bg-cyan-100 px-2 py-0.5 rounded-full" id="kpi-perc-ativos">52,2%</span>
+                </div>
+                <div class="mt-3 text-xs text-slate-500 border-t border-slate-100 pt-2 flex justify-between">
+                    <span>Média por Tutor:</span>
+                    <span class="font-semibold text-cyan-700">32 cursistas</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition border-l-4 border-l-amber-500">
+                <div class="flex items-center justify-between text-slate-500 mb-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Não Ingressaram</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                    <span class="text-3xl font-extrabold text-amber-600" id="kpi-inativos">2.054</span>
+                    <span class="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full" id="kpi-perc-inativos">47,8%</span>
+                </div>
+                <div class="mt-3 text-xs text-slate-500 border-t border-slate-100 pt-2 flex justify-between">
+                    <span>Média por Tutor:</span>
+                    <span class="font-semibold text-amber-700">29 pendentes</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section class="flex justify-center no-print">
+            <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200/80 shadow-sm w-full max-w-4xl">
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">Média de Cursistas </h2>
+                        <p class="text-xs text-slate-500">Gráfico com as informações dos Cursistas Ativos e Inativos no Moodle</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                    <div class="md:col-span-3 order-2 md:order-1">
+                        <div class="bg-amber-50/70 border-2 border-amber-200 p-4 rounded-2xl text-center hover:shadow-md transition flex flex-col items-center">
+                            <div class="flex items-center justify-center gap-2 mb-2">
+                                <span class="w-3.5 h-3.5 rounded-full bg-amber-400 inline-block shadow-sm"></span>
+                                <span class="text-xs font-bold uppercase tracking-wider text-amber-900">Não Ingressaram</span>
+                            </div>
+                            <div class="my-2 flex items-baseline justify-center gap-2">
+                                <span class="text-3xl font-extrabold text-amber-600">47,8%</span>
+                            </div>
+                            <p class="text-xs text-amber-800 font-bold bg-amber-100/80 px-2.5 py-1 rounded-lg inline-block mb-3">
+                                2.054 Cursistas
+                            </p>
+                            <p class="text-[11px] text-slate-500 leading-relaxed text-center">
+                                Cursistas cadastrados que ainda necessitam do 1º acesso.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-6 order-1 md:order-2 flex justify-center items-center">
+                        <div class="w-full h-80 relative flex items-center justify-center">
+                            <svg viewBox="0 0 360 320" class="w-full h-full max-w-sm drop-shadow-2xl">
+                                <defs>
+                                    <linearGradient id="centerLeftTopRefined" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#fef08a" />
+                                        <stop offset="60%" stop-color="#eab308" />
+                                        <stop offset="100%" stop-color="#ca8a04" />
+                                    </linearGradient>
+                                    <linearGradient id="centerLeftSideRefined" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#ca8a04" />
+                                        <stop offset="100%" stop-color="#713f12" />
+                                    </linearGradient>
+
+                                    <linearGradient id="centerRightTopRefined" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#38bdf8" />
+                                        <stop offset="60%" stop-color="#0284c7" />
+                                        <stop offset="100%" stop-color="#0369a1" />
+                                    </linearGradient>
+                                    <linearGradient id="centerRightSideRefined" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#0284c7" />
+                                        <stop offset="100%" stop-color="#0c4a6e" />
+                                    </linearGradient>
+
+                                    <linearGradient id="coreTotalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#1e293b" />
+                                        <stop offset="100%" stop-color="#0f172a" />
+                                    </linearGradient>
+
+                                    <filter id="softShadow3D" x="-30%" y="-30%" width="160%" height="160%">
+                                        <feDropShadow dx="0" dy="22" stdDeviation="14" flood-color="#0284c7" flood-opacity="0.15"/>
+                                        <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.25"/>
+                                    </filter>
+                                </defs>
+
+                                <g filter="url(#softShadow3D)">
+                                    <path d="M 180,150 L 180,182 A 120,82 0 0,1 60,150 L 60,118 A 120,82 0 0,0 180,182 Z" fill="url(#centerLeftSideRefined)" />
+                                    <path d="M 180,150 L 180,182 A 120,82 0 0,0 300,150 L 300,118 A 120,82 0 0,1 180,182 Z" fill="url(#centerRightSideRefined)" />
+
+                                    <path d="M 180,150 L 180,36 A 120,82 0 0,0 180,264 Z" fill="url(#centerLeftTopRefined)" stroke="#fef9c3" stroke-width="1" />
+                                    <path d="M 180,150 L 180,36 A 120,82 0 0,1 180,264 Z" fill="url(#centerRightTopRefined)" stroke="#bae6fd" stroke-width="1" />
+
+                                    <path d="M 178,38 A 118,80 0 0,0 64,116" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.7" />
+                                    <path d="M 182,38 A 118,80 0 0,1 296,116" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.6" />
+
+                                    <line x1="180" y1="36" x2="180" y2="264" stroke="#ffffff" stroke-width="2.5" opacity="0.95" />
+
+                                    <ellipse cx="180" cy="150" rx="73" ry="48" fill="#020617" opacity="0.4" />
+                                    <ellipse cx="180" cy="148" rx="70" ry="46" fill="url(#coreTotalGradient)" stroke="#38bdf8" stroke-width="2.5" />
+                                    <ellipse cx="180" cy="148" rx="64" ry="41" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.25" />
+
+                                    <text x="180" y="128" font-family="Inter, sans-serif" font-size="10" font-weight="800" fill="#38bdf8" text-anchor="middle" letter-spacing="1.5">TOTAL GERAL</text>
+                                    <text x="180" y="156" font-family="Inter, sans-serif" font-size="25" font-weight="900" fill="#ffffff" text-anchor="middle" filter="drop-shadow(0px 2px 4px rgba(0,0,0,0.5))">4.297</text>
+                                    <text x="180" y="172" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#94a3b8" text-anchor="middle" letter-spacing="1">CURSISTAS</text>
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-3 order-3">
+                        <div class="bg-cyan-50/70 border-2 border-cyan-200 p-4 rounded-2xl text-center hover:shadow-md transition flex flex-col items-center">
+                            <div class="flex items-center justify-center gap-2 mb-2">
+                                <span class="w-3.5 h-3.5 rounded-full bg-cyan-500 inline-block shadow-sm"></span>
+                                <span class="text-xs font-bold uppercase tracking-wider text-cyan-900">Ativos Moodle</span>
+                            </div>
+                            <div class="my-2 flex items-baseline justify-center gap-2">
+                                <span class="text-3xl font-extrabold text-cyan-600">52,2%</span>
+                            </div>
+                            <p class="text-xs text-cyan-800 font-bold bg-cyan-100/80 px-2.5 py-1 rounded-lg inline-block mb-3">
+                                2.243 Cursistas
+                            </p>
+                            <p class="text-[11px] text-slate-500 leading-relaxed text-center">
+                                Alunos engajados com acesso confirmado na plataforma virtual.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-2">
+                    <span class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-info text-cyan-600"></i>
+                        <span>Proporção total calculada sobre <strong>4.297 cursistas</strong>.</span>
+                    </span>
+                    <span class="font-semibold text-slate-700">100% de cobertura da base</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Highlights Section -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-4 no-print">
+            <div class="bg-cyan-900/5 border border-cyan-200 rounded-2xl p-4 flex items-center space-x-3">
+                <div>
+                    <h3 class="text-xs font-bold text-cyan-900 uppercase tracking-wide">Maior Engajamento (%)</h3>
+                    <p class="text-sm font-semibold text-slate-800 mt-0.5" id="highlight-top-engajamento"> </p>
+                    <p class="text-xs text-slate-500 mt-0.5">42 cursistas ativos de 55 totais no Moodle.</p>
+                </div>
+            </div>
+
+            <div class="bg-blue-900/5 border border-blue-200 rounded-2xl p-4 flex items-center space-x-3">
+                <div>
+                    <h3 class="text-xs font-bold text-blue-900 uppercase tracking-wide">Maior Turma Total</h3>
+                    <p class="text-sm font-semibold text-slate-800 mt-0.5" id="highlight-top-turma">FERNANDA LIMA SEVERO (94 alunos)</p>
+                    <p class="text-xs text-slate-500 mt-0.5">31 ativos no Moodle e 63 pendentes.</p>
+                </div>
+            </div>
+
+            <div class="bg-amber-900/5 border border-amber-200 rounded-2xl p-4 flex items-center space-x-3">
+                <div>
+                    <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wide">Oportunidade de Busca Ativa</h3>
+                    <p class="text-sm font-semibold text-slate-800 mt-0.5">2.054 cursistas a contatar</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Pendentes para o 1º acesso.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Table Section -->
+        <section class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden no-print">
+            <div class="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-base font-bold text-slate-900">Detalhamento Completo por Tutor</h2>
+                    <p class="text-xs text-slate-500">Distribuição de cursistas por tutor (clique no nome do tutor para ver a lista de cursistas ativos no moodle)</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <div class="relative flex-1 sm:w-64">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Pesquisar tutor por nome..." 
+                            class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition">
+                    </div>
+
+                    <select id="statusFilter" onchange="filterTable()" class="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 transition">
+                        <option value="all">Todos os Tutores (70)</option>
+                        <option value="high">Alta Adesão (&gt; 60% Ativos)</option>
+                        <option value="medium">Média Adesão (40% - 60%)</option>
+                        <option value="low">Atenção (&lt; 40% Ativos)</option>
+                        <option value="large">Turmas Grandes (&gt; 70 Alunos)</option>
+                    </select>
+
+                    <button onclick="resetFilters()" title="Limpar Filtros" class="p-2 text-slate-500 hover:text-slate-800 border border-slate-200 bg-white rounded-xl hover:bg-slate-50 transition text-xs">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left text-xs sm:text-sm border-collapse">
+                    <thead class="bg-slate-100/70 text-slate-700 font-semibold border-b border-slate-200 text-xs uppercase tracking-wider">
+                        <tr>
+                            <th scope="col" class="py-3.5 px-4 w-12 text-center">#</th>
+                            <th scope="col" class="py-3.5 px-4 cursor-pointer hover:bg-slate-200/60 transition" onclick="sortTable('nome')">
+                                <div class="flex items-center gap-1">
+                                    <span>Nome do Tutor</span>
+                                    <i class="fa-solid fa-sort text-slate-400 text-[10px]"></i>
+                                </div>
+                            </th>
+                            <th scope="col" class="py-3.5 px-4 text-center cursor-pointer hover:bg-slate-200/60 transition" onclick="sortTable('total')">
+                                <div class="flex items-center justify-center gap-1">
+                                    <span>Total Distribuição</span>
+                                    <i class="fa-solid fa-sort text-slate-400 text-[10px]"></i>
+                                </div>
+                            </th>
+                            <th scope="col" class="py-3.5 px-4 text-center cursor-pointer hover:bg-slate-200/60 transition" onclick="sortTable('ativos')">
+                                <div class="flex items-center justify-center gap-1">
+                                    <span class="text-cyan-700 font-bold">Ativos Moodle</span>
+                                    <i class="fa-solid fa-sort text-slate-400 text-[10px]"></i>
+                                </div>
+                            </th>
+                            <th scope="col" class="py-3.5 px-4 text-center cursor-pointer hover:bg-slate-200/60 transition" onclick="sortTable('inativos')">
+                                <div class="flex items-center justify-center gap-1">
+                                    <span class="text-amber-700 font-bold">Não Ingressaram</span>
+                                    <i class="fa-solid fa-sort text-slate-400 text-[10px]"></i>
+                                </div>
+                            </th>
+                            <th scope="col" class="py-3.5 px-4 text-center cursor-pointer hover:bg-slate-200/60 transition" onclick="sortTable('percentual')">
+                                <div class="flex items-center justify-center gap-1">
+                                    <span>% Engajamento</span>
+                                    <i class="fa-solid fa-sort text-slate-400 text-[10px]"></i>
+                                </div>
+                            </th>
                         </tr>
                     </thead>
-                    <tbody id="dataTableBody" class="divide-y divide-slate-100 text-slate-700">
-                        <!-- Preenchido via JavaScript -->
+                    <tbody id="tutorsTableBody" class="divide-y divide-slate-100 text-slate-700">
                     </tbody>
                 </table>
             </div>
-        </div>
+
+            <div class="px-4 py-3 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+                <div>
+                    Mostrando <span class="font-bold text-slate-800" id="visible-count">70</span> de <span class="font-bold text-slate-800">70</span> tutores registrados
+                </div>
+                <div class="flex items-center gap-1">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-cyan-500"></span> <span class="mr-3">≥ 50% Engajado</span>
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500"></span> <span>&lt; 50% Engajado</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUADRO A4 -->
+        <section class="mt-8 flex justify-center">
+            <div class="page-a4 border border-slate-300 rounded-lg">
+                <div class="w-full mb-3 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
+                    <img src="banner.jpg" alt="Banner Educação em Direitos Humanos e Saúde Mental" class="w-full h-auto block object-cover">
+                </div>
+
+                <div class="border-b-2 border-slate-800 pb-2 mb-2 text-center">
+                    <h2 class="text-base font-black text-slate-900 uppercase tracking-tight">Quadro Consolidado dos 70 Tutores até o dia 29/09/2026</h2>
+                </div>
+
+                <div class="grid grid-cols-4 gap-2 mb-2 bg-slate-50 p-2 rounded-lg border border-slate-200 text-center">
+                    <div>
+                        <span class="text-[10px] text-slate-500 uppercase font-semibold block">Tutores</span>
+                        <span class="text-sm font-extrabold text-slate-900">70</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-500 uppercase font-semibold block">Total Cursistas</span>
+                        <span class="text-sm font-extrabold text-slate-900">4.297</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-cyan-600 uppercase font-bold block">Ativos Moodle</span>
+                        <span class="text-sm font-extrabold text-cyan-600">2.243 (52,2%)</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-amber-600 uppercase font-bold block">Não Ingressaram</span>
+                        <span class="text-sm font-extrabold text-amber-600">2.054 (47,8%)</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <table class="w-full text-left text-[10px] border-collapse">
+                            <thead>
+                                <tr class="bg-slate-800 text-white font-bold uppercase text-[9px]">
+                                    <th class="py-1 px-1.5 w-6 text-center">#</th>
+                                    <th class="py-1 px-1.5">Tutor(a)</th>
+                                    <th class="py-1 px-1.5 text-center">Tot</th>
+                                    <th class="py-1 px-1.5 text-center text-cyan-400">Ativ</th>
+                                    <th class="py-1 px-1.5 text-center text-amber-400">N/Ing</th>
+                                    <th class="py-1 px-1.5 text-center">%</th>
+                                </tr>
+                            </thead>
+                            <tbody id="a4Column1" class="divide-y divide-slate-200 border-b border-slate-200"></tbody>
+                        </table>
+                    </div>
+
+                    <div>
+                        <table class="w-full text-left text-[10px] border-collapse">
+                            <thead>
+                                <tr class="bg-slate-800 text-white font-bold uppercase text-[9px]">
+                                    <th class="py-1 px-1.5 w-6 text-center">#</th>
+                                    <th class="py-1 px-1.5">Tutor(a)</th>
+                                    <th class="py-1 px-1.5 text-center">Tot</th>
+                                    <th class="py-1 px-1.5 text-center text-cyan-400">Ativ</th>
+                                    <th class="py-1 px-1.5 text-center text-amber-400">N/Ing</th>
+                                    <th class="py-1 px-1.5 text-center">%</th>
+                                </tr>
+                            </thead>
+                            <tbody id="a4Column2" class="divide-y divide-slate-200 border-b border-slate-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mt-2 pt-1 border-t border-slate-300 flex justify-between items-center text-[9px] text-slate-500">
+                    <span>Legenda: <strong>Tot</strong> (Total Distribuição) | <strong class="text-cyan-600">Ativ</strong> (Ativos no Moodle) | <strong class="text-amber-600">N/Ing</strong> (Não Ingressaram)</span>
+                </div>
+            </div>
+        </section>
 
     </main>
 
-    <!-- Toast de Notificação -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl text-xs shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
-        <i class="fa-solid fa-circle-check text-emerald-400"></i>
-        <span id="toastMessage">Dados atualizados com sucesso!</span>
+    <!-- Modal de Cursistas -->
+    <div id="cursistasModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden no-print">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden border border-slate-200 flex flex-col max-h-[85vh]">
+            <!-- Cabeçalho do Modal -->
+            <div class="bg-indigo-600 text-white px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-users text-lg"></i>
+                    <h3 id="modalTutorName" class="font-bold text-base tracking-wide">Cursistas de TUTOR</h3>
+                </div>
+                <button onclick="closeModal()" class="text-white/80 hover:text-white text-lg font-bold p-1 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <!-- Lista de Cursistas -->
+            <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-slate-50/50">
+                <ol id="modalCursistasList" class="space-y-2 text-sm text-slate-700">
+                    <!-- Preenchido via JS -->
+                </ol>
+            </div>
+
+            <!-- Rodapé do Modal -->
+            <div class="px-6 py-3 bg-white border-t border-slate-100 flex justify-end">
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition">
+                    Fechar
+                </button>
+            </div>
+        </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-8 py-4 no-print">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            <p>Painel de Monitoramento Moodle - Direitos Humanos e Saúde Mental © 2026</p>
+            <p class="mt-1">Dados agregados baseados na distribuição oficial do curso.</p>
+        </div>
+    </footer>
+
     <script>
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbzbSe8OY2Do4ZA3BOo3lst03S8lHiupSYVKCjoFRgggoTbGUDakcKFnmz2O6fGY1CXuBQ/exec";
-        let tableHeaders = [];
-        let tableData = [];
-        let activeDropdown = null;
-        let columnFiltersState = {};
+        const tutorData = [
+            { 
+                id: 1, nome: "ADRIANA FELIX RODRIGUES", total: 55, ativos: 42, inativos: 13,
+                cursistas: ["ADRIANA GUTH BAGGIOTO LUCHESE","JANAINA FABIANA DE LIMA DANTAS VIEIRA","LILIANA DEMARCHI DAGOSTINI","LILIANE DOS ANJOS SOARES","LILIANE GONCALVES DELANI","LILIANE SOUZA BARCELOS","LINESSA POLIS KNORST","LISEANE SILVEIRA CAMARGO","LISIANE NOGUEIRA","LUAN FRANCISCO VARNIER","LUBIA DE MEDEIROS MAIA SOUSA","LUCAS BRAVO DE OLIVEIRA","LUCAS GOMES DE SOUSA","LUCIANA FERNANDES DOS SANTOS","LUCIANA LUMERTZ CARDOSO","LUCIANA MARTINS","LUCIANA QUADRADO PERES","LUCIANE DA SILVA POSTIGLIONE","LUCIANE DUARTE DO AMARAL","SANDRA BORGES SILVA MARTINS","SHIRLEY GALDINO DE SOUZA","SHIRLEY MONTEIRO CAMPOS NUNES","SILVIA MOREIRA RODRIGUES DE ALMEIDA","SIMONE MARKS SANTOS","SUENYA FREIRE DO MONTE SANTOS","TAHANY KESSIA VASCONCELOS DOS SANTOS","TAIANI RODRIGUES PONTES","TARCISIO ALMEIDA MENEZES","TEREZA RAQUEL ALVES","THAYANE NASARE DINIZ BENTO DA SILVA","TIAGO VARELO DA SILVA","VALDELITE AZEVEDO BRASILINO","VALERIA MARQUES ABRANTES","VALTEIRIA PEREIRA DA SILVA LINDOLFO","VANDERLAN DANTAS DE LIMA","VANDERLUCIA LOPES DE MENDONCA OLIVEIRA","VANESSA MARTINS LOPES","VANUSA ALVES DE OLIVEIRA RIBEIRO","VANUZA BATISTA DA COSTA DUARTE","VIDELMA MARCENA DE ARAUJO","VIVIANNE CARLA PASCOAL DE JESUS","ZENILDA PEREIRA DA CUNHA"] 
+            },
+            { id: 2, nome: "ALINE DUARTE DA SILVA", total: 49, ativos: 29, inativos: 20, cursistas: ["CLAUDIA MARIA PEREIRA DA SILVA","LUCIENE MELO DOS SANTOS","LUCIMARA VARGAS SOUZA","LUCINEIA FERREIRA DA SILVA","LUIS ANTONIO DANTAS DE FRANCA","LUIS AUGUSTO BASTOS DOS SANTOS","LUIS HENRIQUE CRISTIAN DE CASTRO","LURDES DE FATIMA GAZOLA","MAGNA DAINE DA CRUZ SILVA","MAIRA FERNANDES DA SILVA LOPES","MANOELA LOPES","MARIA DO CARMO ROCHA VITAL","MARIA GRASIELE LIMA OLIVEIRA","MARIA MARCICLEIDE DOS SANTOS","MATHILLA REGIA ARAUJO BARBOSA","MATIAS ANDRADE DO NASCIMENTO","MAYARA DARILIA SILVA LIMA","MILLY VICTORIA DOS SANTOS CONCEICAO","REGYANNE RUFINO ALVES","RENATA SILVA LEITE","ROSIMEIRE SANTOS BRUNO","ROZANI CRISTINA ALVES","SILVIA ROCHA SILVA","STENIA RIBEIRO NASCIMENTO","THAISLANE DOS SANTOS","VALERIA DO NASCIMENTO SANTOS","VANESSA FREITAS VALENCA","VERA LUCIA GOES DE OLIVEIRA","WALESKA KAROLINA TAVARES BASTOS"] },
+            { id: 3, nome: "ALINE ZELLER BRANCHI", total: 50, ativos: 29, inativos: 21, cursistas: ["MARIA REGINA TUSKY DE LIMA","MICHELE DE LIMA BARROS AGUIAR","MICHELLE RIBEIRO CONFESSOR", "NATASHA LIMA BERTOLINO DOS SANTOS","PATRICIA YASMIN LIMA PIMENTA","REBECA SANTOS MATTOS","ROSANGELA DOS SANTOS BASTOS DE JESUS","SARA NASCIMENTO SILVA CAVALCANTE","TACIANA DOS REIS VENDRAMINI","TAIANA ANDRADE GUINCHESKI","TAIANE OSMARI BOTTON","TALLIS FERREIRA MACHADO","TATIANA CARVALHO PEZERICO PEUKERT","TATIANA SPINDOLA HOSSEIN","TATIELI RODIGHIERO HAHN","TEREZINHA SORAIA NUNES DA ROSA","THAISE LOPES GRIGOLO DE VARGAS","TIAGO DOS SANTOS STEIDL","TUANI EVALDT ALVES JOSEFINO","VANESA DOS SANTOS","VANESSA BUENO BRONZONI","VANESSA DA FONTOURA TEIXEIRA","VANESSA DA SILVA VARGAS","VANESSA LIBANIO ALEMAO","VANESSA SEGATO SCHEMMER","VANIA NEUBER","VANUSA SOARES REIS COSENTINO","VIVIAN VIEIRA DOS SANTOS","WANESSA AUGUSTO DO NASCIMENTO DA SILVA"] },
+            { id: 4, nome: "ANDREA CRISTINA B. DE SOUSA", total: 74, ativos: 27, inativos: 47, cursistas: ["ADILSON LUCIO DA SILVA FILHO","ADRIANA CAETANO","ADRIANA MARQUES DOS SANTOS","ADRYA SAMILLY DA SILVA MEDEIROS","AJLINE DE JESUS CIRIACO","ALBERTINO KENNEDY NAZARIO DA SILVA","ALESSANDRA NASCIMENTO RANGEL","ALEXANDER REIS NOGUEIRA","ALEXANDRA SANTOS SANTANA","ALEXANDRE MAGNO DE VASCONCELOS ALVES","ALEXSANDRA MARIA CALHEIROS DE ALMEIDA REGO","ALINE DE NONI DOS SANTOS","ALINE PERAZZOLI BURATTO","ANA DE FATIMA DONATO","ANALICE DE ALMEIDA PINHEIRO","ANDRE DE ARAUJO NEVES","CLAUDIO DIAS DE SOUZA","FABIO DOS REIS DELFIM","JONATHAN LUIS HACKENHAAR","LAIS PASA","MANOELA DEL LUJAN PHILIPPSEN SPOLTI","MARICE DOS SANTOS DE OLIVEIRA","ORIEL FERREIRA MARTINS","PAMELA DA SILVA ROCHA","PAULO ROBERTO FREIRE DE SOUZA","ROSANE PORSCHE DA ROSA","THIAGO RODRIGUES DIOGO DE SANT ANNA"] },
+            { id: 5, nome: "ANDRESSA SILVEIRA MORAES", total: 71, ativos: 34, inativos: 37, cursistas: ["ANA JULIA RODRIGUES PLOCHARSKI","ANA PAULA PEREIRA SOUSA","ANDERLEIA APARECIDA KEGIR JACINTO","ANDERSON TIAGO CORREIA RAYOL","ANDRE LUIZ VIEIRA MARCHI DE OLIVEIRA","ANDRE LUIZ XAVIER ALMEIDA","ANDREIA CRISTINA NASCIMENTO DA SILVA","ANDREIA LIMA BEZERRA DE MENEZ","ANDRESSA VASCONCELLOS SOARES DIAS","ANTONIO AUGUSTO DA SILVA PINHO","ANTONIO RODRIGUES SOBRINHO FILHO","CARLOS AUGUSTO MARINHO DE SOUSA","CRISTINA ROSSANO SOARES","DAILSON MOREIRA DE OLIVEIRA","ESTELA MARIS FAGUNDES","FLAVIA SALUSTIANO BARBOSA","ITALO IRIS BOIBA RODRIGUES DA CUNHA","JUREMA DA SILVA SOARES","KELVIA SOUZA SANTOS","LUIS GABRIEL RODRIGUES SANTOS","REGINA APARECIDA MACHADO DE SOUZA","RENATA DA ROCHA RODRIGUES","RITA DE CASSIA BITENCOURT DE SOUZA","RITA DE CASSIA BOTHONA DA SILVA","RITIELE LEMES RAMOS","RODRIGO PECKER FARIAS CALDERAO","ROSA MARANI RODRIGUES BRIZOLARA","ROSANA DOS SANTOS TEIXEIRA MAIOLLI","ROSANA MARIN DE OLIVEIRA","ROSANA MARTINS DOS SANTOS","ROSANA RIBEIRO DA SILVA","ROSANE SALETE BARBOSA BERNDT","ROSANGELA PEREIRA DA SILVA","ROSELY VASCONCELOS DA SILVA ARAUJO"] },
+            { id: 6, nome: "ANGELA PATRICIA R. DA SILVA", total: 64, ativos: 40, inativos: 24, cursistas: ["AILTON DE SANTANA","ANA LUIZA VALENTE DE SOUZA GONSALVES","ANA PAULA GABRIEL CAETANO","ANGELA EMANUELY SANTOS DE SOUSA","BARBARA CARVALHO KOSMALISKI","ITALO DORGIVAL DE ARAUJO CARDOSO","JENIFER ELOISE EGER CARDOZO","JENIFFER CAROLINY RODRIGUES DE SOUZA","JESSICA ALINE MALLMANN","JESSICA CARDOSO LEANDRO", "JESSICA VEIGA BRAGA","JOANA DARK LOPES DE ALMEIDA","JOANA DE ALMEIDA KONZGEN","JOCEMARA CRISTINA ZAZYKI ZAGO XAVIER","JOSE DONISETE DE MELO","JOSE ERNESTO DOS REIS HELVIG","JOSELIA FERREIRA DE SOUSA","MARCELA CRISTINA DA SILVA PEREIRA","MONICA ROSSETTO","MURILO MAILAN CORDEIRO","NADEGE MOREIRA PEREIRA","NADIA CRISTIANE DOS SANTOS RIBEIRO","NATALIA ZANETTI DANNEMBERG","NEUSA CRISTINA TRINDADE BARROS MENEZES","NEUSA DIAS DOS SANTOS","ODINEI ANTONIO VITT","ODINESIO JOSE MELO VITT","PALOMA WINTER","PATRICIA NUNES GOMES AMARAL","PATRICIA RISTON PEREIRA","PATRICIA ZAVARESE","PAULA SUZELE MENEZES MERENOCK","PEDRO HENRIQUE MARTINS BALDEZ","PRICILA DE ARAUJO","PRISCILA KETELIM LIEMES STEIJER","RAFAELA GARCIA MAURENTE","RAFAELA NUNES","RAQUEL CENCI DUARTE","RAQUEL CHAGAS MACHADO","VICTORIA CAROLINE MARIA DA SILVA"] },
+            { id: 7, nome: "BRUNA LIMA DA SILVA", total: 53, ativos: 37, inativos: 16, cursistas: ["ALCLEA COSTA DE OLIVEIRA","ALLINE ALVES DE OLIVEIRA SANTOS","ANA CELIA DA SILVA BEZERRA","ANE ISABELE DE SOUZA","ANGELA COSTA DE ARAUJO","CRISTINE KRETSCHMER BECKER","DAIANA SOARES LOPES SUDATI","DAIANE ALVES WILLE","DAIANE RAMOS DE LIMA","DAMISA LUCIO DANTAS","DANIELA MEDEIROS DEPETRIS","DANIELA MOREIRA SCHLING MOURA","DANIELE DE SOUZA FERNANDES","DANIELE LOPES ACOSTA","DANIELE MAIA MARQUES","DANIELLE OLIVEIRA RIBEIRO DOS SANTOS","DANIELLE PRUDENCIO BIDES","DANILA DA SILVA E SOUSA","DANILO BORGES PINEZZI","DANUSE DALLA LANA TATSCH","DARIANE REGINATTO","EMILIA GUIMARAES CANELLO","FABIANA DE CASSIA VIEIRA DA SILVA","FERNANDA DA SILVA TEIXEIRA","JANAINA LUCENA DA SILVA","KARLA DANYELLY ARAUJO LEITE PIMENTEL","LAELIO VASCONCELOS SIQUEIRA","LAISE LEANDRO FERREIRA","LENIVADO GONZAGA DE OLIVEIRA","MARIA DO SOCORRO SOUZA GOMES","MARIA GIVANILZA DE OLIVEIRA","MARIA VERONICA NEVES DE LIMA","MARIANA LEITE DA SILVEIRA","RICHIELLE THAISE DE AZEVEDO","ROSANA PEREIRA DA SILVA","STEPHANI LOVANE CARVALHO","VANESSA CARLA COELHO DE LIMA"] },
+            { id: 8, nome: "CAMILA GONCALVES VIEIRA", total: 55, ativos: 33, inativos: 22, cursistas: ["DARLAN DELFINO BERNARDO","DEBORA KUNDE AFONSO","DEIZE CRISTINA CASTOLDI","DELAIR DE ANGELA MARQUES MALU","DENICE PARIZE","DENISE EGIDIO DOS SANTOS GHIORZI","DEVONE GONCALVES","DEYVISSON SILVA","DIOGO FERREIRA BATISTA","DIVANIA BESPALEC DA SILVA","DRIELY DE SOUZA DA SILVA","EDILEIA CRISTINA FELISBERTO SILVESTRE","EDILENE DO CARMO DA SILVA PALMEIRA","MARIA TEREZINHA AVILA MANZZINI MACHADO","MARIA VERGINIA ALVES PACHECO","MARIELE FREIRE LAHUTTE","MARIELI ANE COLLEONE","MARIELI RAMOS PINTO","MARINA ANTONIA DOS SANTOS MEIRELLES","MARINA POLTRONIERI PALOSCHI","MARISA ELY MILANO","MARISTELA POSTAL BOMBANA","MARLI SCARIOT","MARLISE BUCHWEITZ KLUG","MARTHA MOTA DIAS","MICHELE FERNANDA GARCIA PEIXOTO FERREIRA","MICHELE KENSY","MILENA TAVARES LEMES","MIRELA SCHROPFER KLEIN","MIRIAM ANDREA VIVI KUHN","MIRIAM GONCALVES DOS SANTOS AVILA","MIRNA CEZAR DA SILVA","THAMIRES PAES LANDIM DA COSTA"] },
+            { id: 9, nome: "CAROLINE DE BRITO LIMA LIRA", total: 60, ativos: 31, inativos: 29, cursistas: ["ANDERSON FELIPE DE OLIVEIRA FELIX ROCHA","ANDRE PEREIRA DO NASCIMENTO","ANDREA CILENI MALISZEWSKI","ANDREA CRISTINA SANTOS BAKER","ANDRESSA FARIAS SAN MARTINS","ANDRESSIA LOPES PINTO DE SOUZA","ANDREZA FRANCISCA DA SILVA","ANELITA CRUZ DO NASCIMENTO DANTAS","ANGELICA SANTOS LIMA","CAMILA DOS SANTOS GONCALVES","DANILO OLIVEIRA MARTINS","FABIANO JULIAO LIMA DA SILVA","LORRAINE RODRIGUES DE ABREU","MAR CAMPOS SILVA","MONICA BAPTISTA VIANA","RAIANE EVANILSA DE SOUSA RIBEIRO","RAIMUNDA NONATA DA SILVA CALISTO","RHAISA CHAVES DOS SANTOS","ROSANY BESERRA LAVOR","SAMARA DE CARVALHO LEITE DOS ANJOS","SANDRA AMELIA FURTADO DE FARIAS","THAMIRES CRISTINA RODRIGUES PAES LANDIM","THAYLA JULIA DOS SANTOS SOUSA","VANDEMARE DA CONCEICAO SOUSA","VENILSON CARVALHO MIRANDA","VERA LUCIA CHAVES ROSA","VERONICA KEILA DE SOUSA LIMA","VERONICA RIBEIRO DA SILVA","WENDELL LIMA LACERDA","YASMIN DOS SANTOS ALVES","YURI MAGALHOES ARAUJO"] },
+            { id: 10, nome: "CAROLINE DE PAULA BATISTA", total: 45, ativos: 28, inativos: 17, cursistas: ["ALICE PARENTE DE SOUSA","ALICIANE REBELO E REBELO","ALINE CRISTINA ARAUJO VARGAS","AMANDA FERREIRA DO CARMO","ANA CAROLINA DA CONCEICAO SANTOS","ANA CAROLINA LEITE CANUDO","ANA CAROLINA SANTOS SILVA","ANA CRISTINA BERGALO ZEFERINO","ANA CRISTINA FERREIRA ROCHA DOS SANTOS","ANA CRISTINA OLIVEIRA LEMOS","ANA PAULA BRAGA BEISE","ANA PAULA SANTOS DE OLIVEIRA","ROSANGELA FIRMO DE LIRA","ROSELI FREITAS DO NASCIMENTO","ROSEMERE SOUZA DA SILVA PAIXAO","ROSILENE MOREIRA BARROS","SAMARA ANACLETO DO NASCIMENTO","SANDRA MARIA DE SANTANA RAMOS","SELMA TEIXEIRA DE CARVALHO PARENTE","SHEILA LORENA FERNANDA DE OLIVEIRA","SIDALVA FIRMINO TAVARES","SINTIA MARIA SILVA DE OLIVEIRA","SYLVANA PINTO BEZERRA","THAIS DA SILVA SENA","THAYS TORRES DE LIMA","VALDIRENE CORDEIRO DA SILVA","VANDERSON ALBUQUERQUE MOURA","WENDERSON LUAN DOS SANTOS LIMA"] },
+            { id: 11, nome: "CASSIA V. T. DE SOUZA MARQUES", total: 66, ativos: 29, inativos: 37, cursistas: ["ANA ROCHA","ANDERSON RODRIGO DE MELO QUEIROZ","ANDRE TREVISAN","ANDREA VIGIL GONCALVES DA SILVA","ANTONIO PEDRO AGUIAR DE ALMEIDA","AURIVAR FERNANDES FILHO","BIANCA RODRIGUES ROCHA","BRENO GABRIEL FERREIRA FAGUNDES","MARIA GEOVANA PEREIRA CHAVES","MARIA GIVANILDA DE ANDRADE SILVA","MARIA IJACI GOMES CORREIA","MARIA ROSILDA MARTINS CAVALANTI","MARIA SEVERINA DOS SANTOS","MARIA SOLANGE RODRIGUES BEZERRA DA SILVA","MERILUCE ALVES DA SILVA","MIKAELA STARK CARVALHO MARQUES","MONICA MARIA VIEIRA GOMES DA SILVA","NADIA FERNANDA DUARTE","NATERCIA GOMES DE SOUSA","NATHALIA DE JESUS JANUARIO NOGUEIRA","NAYARA BARBOSA DIAS","NEEMIAS FLOR BRANDAO","ODAILMA SIQUEIRA DA SILVA","OLGA MARIANO DE OLIVEIRA","PABLO HENRIQUE CORTES BARBOSA","PAMELA DRUM PETRY","PATRICIA MIRELLE DE VASCONCELOS BARBOSA FREITAS","RAILSON LEITE DE OLIVEIRA","RAYNIELLE DIAS COELHO RODRIGUES"] },
+            { id: 12, nome: "CASSIO ANDRADE MACHADO", total: 75, ativos: 35, inativos: 40, cursistas: ["ALINE BARBARA DE JESUS SANTOS DE ABREU","ANGRA DA SILVA PEREIRA","ANNA KAROLINA DE MACEDO GALVAO SILVA","ANTONIO BOAVENTURA DE JESUS FILHO","ANTONIO EMERSON ESTEVAO DE LIMA","ANTONNY LEANDRO RODRIGUES DE OLIVEIRA","ARILSON LOBO FIGUEIREDO","AUGUSTO PICOLO FURINI","BEATRIZ BOEIRA","BEATRIZ FLORES TORRES","BEATRIZ LUCIANE BORTOLINI","BENEDITA JOCELIA DAS MERCES MONTEIRO","BRUNA LINS BARBOSA MAIA VILACORTA","EDUARDA CASANATO AIRES","HELENA VITALINA SELBACH","MARBA VIVIANE BORSATO OCANA DE OLIVEIRA","MARCELO ORDESTO RODRIGUES","MARCIA CRISTINA GOUVEA GOMES","MARCIA REIS DE CASTRO SILVA","MARCIA ROSANGELA ALVES","MARCIO DANIEL BOLDORI","MARCOS TADEU TAMIOZZO","MARE AXINIA DE OLIVEIRA OSSANES","MARENIZE SANTOS EDER","MARIA ANGELICA MASSENA DE AZEVEDO","MARIA CRISTINA DE OLIVEIRA OSORIO","MARIA CRISTINA DOS SANTOS MARTINS","MARIA EDUARDA CHITOLINA","MARIA EDUARDA FELIPETTO MORIN","MARIA EDUARDA SANTOS PRUS","MARIA ELIZA CANABARRO DA SILVA","MARIA LUCIA LIMA ANTUNES","MARIANA SANTANA FALKOWSKI","PATRICIA COSTA PEREIRA SELBACH","RAKELL RAYS DOS ANJOS ALVES"] },
+            { id: 13, nome: "CLAUDIA ROSANE C. S. ALMEIDA", total: 69, ativos: 22, inativos: 47, cursistas: ["ANA PAULA CASAGRANDE MARTINS","BARBARA POLIANA ALVES DE BRITO","BIANCA RAYSSA MACHADO","BRENDA CAROLINE BITENCOURT DA SILVA BIDART","BRUNA SILVA BRITO","CAIQUE SABINO DOS SANTOS","CAMILA CRISTINA GONCALVES DE GOUVEIA MARQUES","CAMILLA ALMEIDA RODRIGUES","CAREN TATIELI SOARES PINHEIRO","CARLA KATIANE FROIS PEREIRA","CARLOS EDUARDO DOS SANTOS","CIBELE CHEROBINI CLAVEL","DAHIANA NUNEZ","DAIANE FERREIRA DA SILVA","ELISIANE APARECIDA SIMIANO DE LORENZO","JAIR GARCIA DOS SANTOS","JANE SALDANHA CUNHA DE OLIVEIRA","JULIA ANDRESSA DOS SANTOS DE OLIVEIRA","MARIA ESTER CENTURIAO BENITES GARCIA","MARIA JANICLEIDE DE FREITAS PRAXEDES","MARIA LUANA MOREIRA ALVES","MARIANA GUIMARAES REIS"] },
+            { id: 14, nome: "CLEBERSON VIEIRA DE ARAUJO", total: 50, ativos: 31, inativos: 19, cursistas: ["MARCIA MASIEL SCHNEIDER", "MARCIA REGINA ROIESKI TONIAL","MARCIA SILVA","MARCOS BARBOSA DA LUZ","MARCOS SILVEIRA ARANGUIZ","MARGANE HELENA COSTA BRUM","MARIA ALESSANDRA DE BRITO TORQUATO","MARIA CLARA FERREIRA MACHADO","MARIA DE FATIMA MARROQUE BATISTA ARAUJO","MARIA DE LURDES ZANON","MARIA DO CARMO DA SILVA FERREIRA ANTUNES","MARIA TERESA DA SILVA ANDRADE","MARIANA SANTANA FERNANDES","MARKSON GOMES DE LACERDA","MARKSUENIA GUIMARAES DE AMORIM SOUSA","MERCIA FRAGOSO DE LIRA SANTOS","MICHELI ALEXANDRE DE LIMA","PATRICIA DO NASCIMENTO SILVA","PAULO GUILHERME SILVA DE GOES","RAFAELA DE ARAUJO DANTAS","REGIANE LOPES VIANA","REJANE MARIA ABILIO MANGUEIRA","RENATA ALVES BARBOSA","RENATA KALLIANE MENEZES ALVES","RENATA MANOELA DA SILVA","ROBERTO HILARIO ALVES RIBEIRO","ROSANGELA PEDROZA DA GAMA SIMOES","ROSIANA FERREIRA DE MEDEIROS","ROSIMAR MARCELINO DE FREITAS","SAMUEL CESARINO DA NOBREGA","SAMUEL SILVA SANTOS"] },
+            { id: 15, nome: "CLEITON DOUGLAS B. SANTOS", total: 53, ativos: 29, inativos: 24, cursistas: ["ADRIANA PINHO DA SILVA","ADRIANA ROSA DO NASCIMENTO","ALICE CAETANO VIEIRA","ALINE PADILHA","ALINE SOARES","ANA CAROLINA DA CUNHA CAPISTRANO","ANA KALINI DA COSTA PEREIRA","ANA MARIA RODRIGUES","ANA PAULA LEITE JUI","HARUMI FERNANDES OKA","JOSE SOARES FILHO","JOSIELAYNE GABRIELE BARBOSA SOARES","JOSINALDO BARBOSA DA SILVA","JULIA CAROLINA DA COSTA SANTOS","LAFAIETE ANDERSON DE ALMEIDA SILVA","LAURA CAVALCANTI BEZERRA DOS SANTOS","LAYANE RUELA DE OLIVEIRA","LEANDRO PEREIRA DA SILVA MELO","LETICIA MIRANDA BARBOSA DA SILVA","LUCIANA MARIA MAGALHAES COSTA","LUCIMERE PEREIRA DOS SANTOS","LUIZ CARLOS CAVALCANTE","LUMA LAIS PAIVA SOARES","MARCELO HENRIQUE TENORIO PEREIRA","MARIA ADILLA TEIXEIRA DE SIQUEIRA MEDEIROS","MARIA ADJAILDA DA SILVA","MARIA BERTILLA COSTA DA SILVA","MARIA EDUARDA DA SILVA","MARIA FRANCINEIDE LIMA SILVA"] },
+            { id: 16, nome: "CRIS DANIELA OLIVEIRA MACEDO", total: 74, ativos: 51, inativos: 23, cursistas: ["ALEJANDRA STEPHANY JAMA COELLO","ANDRES DAVID FORERO GARRIDO","ANGEL DANIEL VILLALBA VARGAS","ANNY LEDYS ACEVEDO CASTRO","CARLOS FRANCISCO RUSSIAN FERNANDES","CASSIO SOLANO SUAREZ CARBALLO","CRISTIAN CAMILO CARDOZO","DAVID JOSUE ACOSTA MORALES","EDIR CARVALHODIAS","EDUARDO DO NASCIMENTO DA SILVA","ELEN CRISTINA AMORIM CARDOSO","ELENICE FERRO","ELENIR FATIMA CIARINI","ELGARO AUGUSTO CASTANHO BALDASSARI","ELIANA DE OLIVEIRA SOUZA ALMEIDA","ELIANA SELBACH DOS SANTOS","ELIANE CONTRERA BENITES","ELIANE LOPES OLIVEIRA","ELIANE SEVERINO MORAES", "ELIAS GABRIEL RAMIREZ BARBOZA","ELISA GRACIELA ROSAS MIRANDA","GABRIELA PAEZ ALARCON","JIANHONG CHENG","JOB ENRIQUE GARCIA LOPEZ","JUAN SEBASTIAN ORTEGA SIERRA","KEINER NAHUN RAMOS GARCIA","LIZIANE GIOPPO BITENCURTE ALVES","LIZIANE HASFELD MACHADO","LUANA BEATRIZ BERSCH BIERHALS","LUANA FLORIANO","LUANA ROSALIE STAHL","LUCAIRES CZERMAINSKI GONCALVES","LUCAS DALLA MARIA","LUCIANA DORNELES ALVARES","LUCIANA FERREIRA ROSSATO","LUCIANA MENDES MACIEL","LUCIANE ONGARATTO RAMOS","LUCIANE SCHRODER VITORIA","LUCIANI BARBOSA DE OLIVEIRA","LUCIANI RAQUEL LOURENZI","LUCIMAR DOS SANTOS GONCALVES","LUCIMARA DIAS FERRIOLI","LUCIMARA DOS SANTOS DE MOURA","MAICON BRAZEIRO ILHA","MAINARA BUZACHI GRANDO","MIGUEL GARATEGUY ABRAHAM","MOISES DAVID ASIS MANTILLA","OLGA BERENICE SUAREZ CARBALLO","ROSANA LABADIE LARA","SARA SANCHEZ CASTANEDA","VANESSA ROCHA TEIXEIRA"] },
+            { id: 17, nome: "DANIELE CRISTINA B. DE SOUSA", total: 77, ativos: 38, inativos: 39, cursistas: ["BELAMAR ANZILIERO","BIANCA BARCELOS CARVALHO","BIANCA URRUTH DE OLIVEIRA","BRUNA REINALDO LOURENCO","BRUNA URRUTH DE OLIVEIRA ANTUNES","CARLA ISABEL GOMES VIDAL","CARLOS ALBERTO DE SOUSA LIMA","CARLOS HENRIQUE SANTOS PEREIRA","CAROLINE MANTOVANI DELFINI DE ARAUJO","CINTIA TIBURSKI SOUZA","CLARICE BERRUTTI DE MATOS","CLARICE TAMARA OLIVEIRA DA SOUZA","CLEIA DALCUL DA SILVA OLIVEIRA","CLEIDIANE SANTOS DE MIRANDA","CONSTANTINA DE FATIMA PORTELA DE SOUZA","CRISLAINE VIEIRA DE SOUZA","CRISMALAR FATIMA QUEIROZ DAVID","CRISTIAN ALESSANDRO SILVEIRA RIZOS","DAIANA HOCHSCHEIDT","DAIANE ROSA BISPO DOS SANTOS","DAMIANA DA SILVA DA RESSURREICAO","DANIEL RODRIGUES SANTOS","DEIZE NAZARIO DOS SANTOS","JUCICLEIA FERREIRA","LEONARDO MATTOS DE LOYOLA","MARCIA SERAFIM ROCHA FERNANDES","MARIA CELIA DA SILVA","MARIA CRISTIANE MACHADO FERREIRA LIMA","MARIA DA CONCEICAO ALVES PEREIRA","MARILENE SCAPIN","MARIO ANTONIELLI VILARINHO SANTOS","MAYRA KELLY PEREIRA ROSA BOMFIM","MELISSA FLAVIA DE OLIVEIRA RODRIGUES","MIRIAM MORAIS","MIRTES CARVALHO ALENCAR DE OLIVEIRA","NAILA LUIZA DE CARVALHO MAURIZ","NAIRA YTALA RIBEIRO DA SILVA","PATROCINA MARIA DE OLIVEIRA PRACA"] },
+            { id: 18, nome: "DANIELLY M. F. L. DE ALMEIDA", total: 65, ativos: 31, inativos: 34, cursistas: ["DANIELA DE OLIVEIRA PREISLER","DANIELA FERRUGEM","DANIELA RAMOS LOPES MAIA","DANIELE RAMALHO DE ASSIS HANEMANN","DANYELLA DE ARAUJO QUEIROZ","DAVI RODRIGUES MESQUITA","DAYANE RIBEIRO SILVA LIMA","DEISE LUCIA BARBOSA OLIVEIRA","DEISI LUCIANA EMMERT CARNETTI","DENISE APARECIDA SILVA DE SOUZA CAMPOS","DIANE RUTESKI","DINIZ DA CUNHA SILVEIRA","DOUGLAS DE SOUZA NEVES","EDENIZE SILVA SANTOS","EDIR JUNIOR DOS SANTOS BATISTA","EDMEIRE ALVES DOS SANTOS MOURA","EDUARDO CAETANO DOS SANTOS","EDUARDO MAURO VICENTE","ELAINE CANDIDA BUTHERS ANELLI BRANCO","LUIZ FELIPE FERREIRA GOMES DE BARROS","MAIRLA DA SILVA COELHO","MARCIA AMARAL DE OLIVEIRA","MARIA BETHANIA ANDRADE DE BRITO DO NASCIMENTO","MARIA DA PAZ FILHA MESQUITA","MARIA DE LOURDES MARIANO DE SOUSA","MARIA DO SOCORRO DO NASCIMENTO SILVA","MARIA ELISABETH RICARDO MONTEIRO","MARIA IZABEL PEREIRA ARAUJO","MARIA JOSE DE QUEIROZ","MARIA LIDIJANNE CARDOSO ZUZA","MARIA LUCIA DE SOUSA"] },
+            { id: 19, nome: "DEBORA MARIA B. DE SOUSA", total: 47, ativos: 37, inativos: 10, cursistas: ["PATRICIA AMORIM DA SILVA","PATRICIA CAMARA DA SILVA ANDRADE","PATRICIA DALIANE BEZERRA DE OLIVEIRA","PATRICIA DO NASCIMENTO GALHARDO LHEN","PATRICIA ELISANGELA BOGO","PATRICIA GARLET STEFANELLO DE PELLEGRIN","PATRICIA MACHADO DA SILVA","PATRICIA SILVA DE ALMEIDA SANTOS","PATRINA DE SOUZA GIRELLI","PAULA CEZAR MUNHOZ","PAULA CRISTINA KLAHOLD RODRIGUES DOS REIS","PAULA SANTOS OROFINO","PAULO ROBERTO LICHT KEMPER","PRISCILA CARNEIRO DA SILVA CECATO","PRISCILA CARRICO GODOI","PRISCILA VAZ MAGRINELLI","RAFAEL ELIZIARIO VIEIRA","RAFAELA MARIA DA SILVA","RAFAELLE CARVALHO LOUREIRO","RAIMUNDO PAULINO DA SILVA","RAPHAEL DA SILVA SODRE","RENATA FERREIRA LEITE","SANDRA REGINA PETRONE MOLLA","SILAS DONATO NASCIMENTO","SIMONE HENRIQUE DA SILVA GUEDES","SUSIE MARY ALVES RAMOS DE ARAUJO","TANIA DOS SANTOS","TATIANA APARECIDA BRAYN","TATIANA SANTOS GALENO","TATIANE APARECIDA FERREIRA","TAYNA SENA ANDRE","TEREZA FERNANDA TELES","VALERIA TEIXEIRA MOTA DE SOUSA","VANESSA CARDOSO DA CRUZ","VANESSA LUCIANNE RIBEIRO MACHADO","VANIA PARREIRA TOSI","VIVIAN SALLES LEITE"] },
+            { id: 20, nome: "DOUGLAS H. DE OLIVEIRA BRAZ", total: 84, ativos: 25, inativos: 59, cursistas: ["ADRIANA TAKEDA FERNANDES","AMANDA FRAGA","CREZIA REGINA PARO DE OLIVEIRA","CRISTINA FERREIRA MOREIRA SOUZA","EDUARDO DA SILVA JACQUEMINOUTHE","EIDSON MARQUES DA SILVA PASSOS","ELAINE CRISTINA DOS SANTOS ARAGAO","ELAINE CRISTINA FERREIRA DA SILVA","ELENE KAREN SILVA LISBOA","ELIANE CRISTINA BAZON NOGUEIRA RAMOS","ELIANE SOUZA SILVA MONTEIRO LUCIO","ELIEL DUARTE DE AZEVEDO","ELIS REGINA RODRIGUES SILVA","ELISANDRA BRESOLIN","ELISANGELA APARECIDA JAEGER","ELIZA ARAUJO MACHADO","EMANUEL DOS SANTOS SOUZA","EMANUEL WAGNER DE LIMA SILVA","EMILIA CONCEICAO MOREIRA ARCE","HUGO SANTOS DE OLIVEIRA","MARIA DE FATIMA DA SILVA OLIVEIRA","PAULA SCHAF LOPES SILVEIRA","RAQUEL DE MORAIS ZAGO","SERGIO PEREIRA","SILVIA DOS SANTOS COUTINHO"] },
+            { id: 21, nome: "EDILZA SILVA MARTINS", total: 87, ativos: 28, inativos: 59, cursistas: ["ADRIANA APARECIDA DE MORAES FREITAS","ADRIANA DO CARMO DOLIVEIRA","AIMEE TOLEDO","ALAN PEREIRA OLIVEIRA","ALINE VIRGINIA HOMEM NUNES","ALLAN PIERRE DE JESUS RODRIGUES","AMANDA MOEMIA RODRIGUES DE ARAUJO HOLANDA","ANA CLAUDIA DE OLIVEIRA","ANA MARIA DE JESUS","ERICO SERAFIM ANSELMO","FANG SHEN SILVA DE JESUS","FELIPE RODRIGUES ALVES DA SILVA","FERNANDO ROCHA ATHAYDE","GABRIEL HENRIQUE DE CASTRO WEBER","GESIANE NASCIMENTO LIMA","GILSON MANUEL XALUMBO","KAMILLE FERNANDES PEREIRA MARCELINO","LEOCY MARIA SARAIVA COSTA DO NASCIMENTO","LUCIANE CRISTINA CALIXTO DE LIMA","LUCIMAR RODRIGUES SOARES DE MORAES","RAQUEL PELISSARI KATSCHOR","REGIANE TAVARES DA CRUZ SANTOS ANTUNES","REGINEIDE GOUVEIA DE OLIVEIRA","REGINEIDE PATRICIA ELIAS DE SOUZA","RENATA BRUM KERCHINER","RENATA PEREIRA DE OLIVEIRA VICENTE","RITA DE CASSIA DE CARVALHO SILVA","RITA FURTADO"] },
+            { id: 22, nome: "EDSON SANTOS DE LIMA", total: 48, ativos: 31, inativos: 17, cursistas: ["ANNA FLAVIA OLIVEIRA GOMES","AURELIA DA SILVA BARRETO","CAROLINA DA CUNHA ALVES","CLARISLAINE PASSOS FREIRE","CLEUMA QUIRINO RODRIGUES","CREUNICE DOS SANTOS VIEIRA SOARES","CRISTIANE DOS SANTOS","DANIELA DE SANTANA ALMEIDA","DANIELA ODETE DIAS","KASSIOS CLEY COSTA DE ARAUJO","LETICIA GRACYELLE ALEXANDRE COSTA","LIGIA VIEIRA NASCIMENTO DOS ANJOS","LORRAYNE ALVES ROCHA","LUCIA LUCAS TEIXEIRA","LUCIANA SILVA MACIEL","LUCIANE DE SOUZA CONSTANTINO","LUIZ HENRIQUE DOS SANTOS","MANUELLA DE CASTRO ALVES SOARES","MARA DENISE DA SILVA MATTOS","MARA SILVA MOURA","MARCELLE ALVES VIEIRA","MARCO ANTONIO LIMA CORREA","MARIA DE LOURDES ALEXANDRE","MARIA IEDA DE FRANCA BIZERRA","MARIA LANDECI CARNEIRO DE JESUS","MARY DE SOUSA BATISTA","MAYARA JARDIM GASPAR","MELQUISEDEC ANSELMO DA COSTA AZEVEDO","NADIA VANESSA GONCALVES DA SILVA","NAEIDE SANTOS MOREIRA","NATALIA DE ARAUJO ALBECHE"] },
+            { id: 23, nome: "EDUARDO JORGES PUGLIESI", total: 52, ativos: 32, inativos: 20, cursistas: ["ANA ANGELICA SILVA","ANNA BEATRIZ BULHOES","CAROLINA ALVES ABREU DE SOUZA","CLAUDIA DOS SANTOS","CLAUDIANO OLIVEIRA SANTOS","CRISLANE BATISTA DOS SANTOS DUTRA","DANIELA ALELUIA DOS REIS SILVA","DANIELA ALLENDE TORRES","DANIELLE RIBEIRO ALVES","DEBORA DOMINGUES SEVERINO DE SOUZA","FABIOLA LIMA DA ROCHA STEIN","HELENA CRISTINA ARAGAO DE SA MARTINS","JACQUELINE DA CRUZ","JAQUELINE DE OLIVEIRA ARAUJO","JOASILDO DE MORAIS SANTOS","JOCILANDIA ALVES RIBEIRO","JOELMA FIGUEIREDO SOUSA RODRIGUES","JORDANIA SILVA DO NASCIMENTO","JOSE ALMEIDA DE LIMA JUNIOR","JOSE DIEGO JORGE DE OLIVEIRA","JOSE FRANCISCO DOS SANTOS ADELINO","JOSE GERISON ASSIS DA SILVA","JOSE NILSON COELHO DE SOUSA","JOSE ROBERTO PINHEIRO DA CUNHA","JOSE SALES DE AGUIAR JUNIOR","JOSEDNA DE SOUSA DELFINO LEITE","MARCOS RODRIGO GUIMARAES CRUZ","MARIA EDUARDA GOMES MARQUES","NADIA HERNANDEZ","RICARDO FELIX DE LIMA","SENDY CRISTINE ALVES DE ALBUQUERQUE","VERONICA BATISTA PINHEIRO"] },
+            { id: 24, nome: "ELIZABETH LIRA SILVA", total: 68, ativos: 31, inativos: 37, cursistas: ["ANA CLEA MENDES BRITO","CIBELI GONCALVES CARDOZO","ERICA MACHADO LEOPOLDO","ETIENE NAIARA GUERRES DE OLIVEIRA","EVELYN FERNANDA DA SILVA BRAGA","FABIANA FACHINI","FABIANA HOFFMANN","FABIANA SANTOS GARCET","FABIANA SILVA MORAES","FABIO DE OLIVEIRA CLEMENTE CABRAL","FERNANDA BRITES LUIZ","GEORGE CAMARGO","JOELMA DE FREITAS VITORIA","JULIO CESAR ALVES DA SILVA","LIDIANE DA SILVA KRETSCHMER NASCIMENTO","LUSIA MARIA DA SILVA","MARIA JOSE DE SOUSA","PAOLA SCHEIBLER","PAULO RAMSES DA COSTA","RAFAELA DA SILVA CARVALHO","REGINA LIMA DOS SANTOS LOPES","RENATA CRISTINA ALVES DE SOUSA","SANDRA MADALENA OLIVEIRA DA SILVA","SIDNEY FRANCISCO SILVERIO DOS SANTOS","SOSANA DE FATIMA GIORDANI","THAIS ALVARENGA DE SOUZA","TIBERIUS CESAR GALHARDO DE VASCONCELLOS","VANESSA WOLFF","VERONICA DE ARAUJO LOBO","VIVIANE BEATRIZ BRITO DE SOUZA","WIVIANE DIAS RODRIGUES RITTER"] },
+            { id: 25, nome: "EMMYLY NAYANE B. DE OLIVEIRA", total: 44, ativos: 38, inativos: 6, cursistas: ["ADELE CATARINA VIEIRA DOS SANTOS","ADRIANE ALVARO DAMASCENA","ALESSANIA SANTOS ARAUJO LIMA","ALICE ESTEFANNE SILVA ROCHA","ALINE DE SOUZA SILVA","ALINE OLIVEIRA DE JESUS","ANA CAROLINE SILVA AGRA ANDRADE","ANA CLAUDIA CAMPOS","ANA MERCIA DANTAS DA SILVA SANTANA","ANA TAYNARA DO ROSARIO SILVA","ANDERSON BARBOSA MORAIS","ANDERSON SILVA MENEZES","ANDREA FONTES SILVA MACEDO","ANDRESSA LILIAN RODRIGUES DE OLIVEIRA","ANIR SANTOS DE OLIVEIRA","CAMILA MIRELI CALACA DE SA","CLAUDIA ELIODORIO DE OLIVEIRA CONCEICAO","CLEOCIVANIA DA SILVA BARBOSA","DAVI SIQUEIRA SOBRAL","DAVID FRANCELINO RODRIGUES","ELAINE DE ARAUJO CANUTO","ELAINE MARIA CARVALHO CORREIA","FELIPE ALMEIDA DE OLIVEIRA","GILVANIA MARIA MEIRELES MONTALVAO","RAISSA GODINHO LEMOS","RAISSA PEREIRA FAJARDO","RAQUEL MONTEIRO","RAQUEL TEIXEIRA DE ANDRADE","REGIANE HACK","RENATA VALADAN SEVERO","RINALDO DOMINGUES BARROS","ROBERTA SACON","ROSANE MOREIRA DA SILVA","ROSANGELA PIRES","ROSIANI MIGNONI","ROSINETE CORTEZ DOS SANTOS NASCIMENTO","SAFIRA DE CARVALHO ALVES COTRIM","SAMUEL PONTES SALES"] },
+            { id: 26, nome: "EMYGDIO FLORIANO DINIZ VIEIRA", total: 62, ativos: 37, inativos: 25, cursistas: ["FRANCINETE PEREIRA LEITE BENTO","FRANCISCA ROSEANE FRANCO RIBEIRO DE SOUSA","GEISE KELY TELES LEITE","GENESIO FIGUEIREDO DA SILVA NETO","GEOVANIA PEREIRA DA COSTA","GERLANIA SANTOS","GUILHERME CANDIDO DA SILVA","HAWILLA VITORIA GOMES COSTA","HUGOENILDO FERNANDES DE OLIVEIRA","IRINES SOARES DE OLIVEIRA","ISABELLE COUTINHO RAMOS BENICIO","ISAIAS DE OLIVEIRA EHRICH","ISAIAS PAULO NUNES DE ALMEIDA","IVONEIDE DE FRANCA BIZERRA","JACILENE FERREIRA DA SILVA OLIVEIRA","JESSICA DOS SANTOS MACHADO","JOAO ARLINDO REMBOLD","JOAO DANTAS NETO","JOCIELI APARECIDA MARCONDES","JOSSUMARA CARDOSO PINTO","JULIANA ARAUJO SIMOES","JUSILENE PEREIRA TIBURCIO","JUSSARA NASCIMENTO TORCATO","KAMILLA CABALHERO","KARINE LOCATELLI DINON STUMPF","KEILLA MONTEIRO DE ALENCAR RAMOS","MAELI DE OLIVEIRA SANTOS","MAGDA TEREZINHA SANDIM CASTRO GUEDES","MARCIO DERCIO DE ATAIDE","MARCIO INOCENCIO RODRIGUES DA SILVA","MARIA DA CONCEICAO DE JESUS","MARIA EDUARDA FERREIRA SILVA","MARIA EDUARDA RODRIGUES DOS SANTOS","MARIA GRACILDA BARROIS LESCOP","MARIA TEREZA FREIRE DANTAS","MARIA VILLANY DE MEDEIROS PAZ","MARIANA AIRES DOS SANTOS"] },
+            { id: 27, nome: "ERIKA NIELLY DE SOUSA BRITO", total: 67, ativos: 28, inativos: 39, cursistas: ["AURINICE NUNES DE LIMA","FRANCISCO DE ASSIS DE SOUSA","FRANCISCO FIDELIS DA SILVA FILHO","GISELLY DOS SANTOS OLIVEIRA","GISLANE COSTA AGUIAR","GRACIELE SILVA TEIXEIRA","GUSTAVO BRUNO CAVALCANTE CUSTODIO DE ASSIS","HELENA MAIA MARTINEZ","HELLEN ALESSANDRA DE SA BEZERRA","IAGO HENRIQUE DE CARVALHO MARTINS","ISABEL OLIVEIRA NARINO","ITALO SANTOS BARBOSA","JAINE GABRIELLE DA ROSA PIRES","JAMILLE PEREIRA LIMA","JAQUELINE BERNARDO DA SILVA","JOAS JOSE DE ANDRADE","JOSE ANTONIO FREIRE FORMIGA MARTINS","KARINA ANUNCIADA BARROS","RODRIGO NATHAN ROMANUS DANTAS","RODRIGO SOARES LICHTLER","RONALDO DE CAMPOS GASTALDO","ROSANA REGINA DILL","ROSANA SCHULTZ MURLIK","ROSANGELA CHIMENES TORRES","ROSANGELA OLIVEIRA","ROSELEI GRETZLER","ROSELI DE SOUZA DA SILVA","ROSELI TERESINHA RAIMUNDI"] },
+            { id: 28, nome: "ESLANIA MARTINS LOPES", total: 68, ativos: 30, inativos: 38, cursistas: ["ALBA NIZE DO NASCIMENTO SANTOS","ALESSANDRA RANIERY ARAUJO ALVES DE SOUSA","ANA GABRIELLY DA SILVA","ANA REGILA LUCIANO DA SILVA","CELIA MARIA SILVA OLIVEIRA MOURAO","ELIANE MARIA DOS SANTOS","EROS FERNANDES AQUINO DO NASCIMENTO BARBOSA","EVANILDE CARVALHO PASCOA","FRANCISCA DANIELE SOARES DO CARMO","JACI CONCEICAO DOS SANTOS DOS SANTOS","JEANE LIMA RUFINO","JHONE NUNES DA SILVA","JONATAN ARIEL DE OLIVEIRA MELO","JOSE ANTONIO SOUZA VITAL","JOSE EDGARD LINCOLN DE FREITAS AZEVEDO","JOSE MAURO BRAZ DE AQUINO","JOSE RICARDO VENANCIO","JOSELINDA DO SACRAMENTO LIMA RAMOS","JOSIMAR JOSE DE OLIVEIRA","JOYCE APARECIDA DONEDA","JULIA LIMA","KAREN ANNY SOARES LIMA","SHARLLENY LORAINE MOTA CAVALCANTE","SIMONE MARIA BARROS TEIXEIRA ALVES","SIMONE THANG DE CARVALHO","SIMONE ZANIN RODRIGUES","SIMONETY EVANGUELIA ATHANASIO","TAINARA DE MEDEIROS MAIA","TANDARA DEITOS","TANIA REGINA FORTE PADOVA"] },
+            { id: 29, nome: "EUGENIO P. N. PAULO JUNIOR", total: 68, ativos: 29, inativos: 39, cursistas: ["DAVI RODRIGUES DA SILVA","DAYSES BALDUINO DA SILVA","DEIVIDE SANTOS PEREIRA","DENISE SOARES MAIA DO NASCIMENTO","DIEGO LEITE DOS SANTOS","EDINARYA KELANYA OS SANTOS PEREIRA","ELEMILTON ALVES DE SOUZA","ELIANA CHIES","ELIANE LEAL DO NASCIMENTO","ELINEIDE BERTOLDO LIMA","ELINEIDE CARDOSO DO NASCIMENTO","ELISANGELA MEDEIRO DE OLIVEIRA","ELIZANIA DE FATIMA BARROS DINIZ","EMILLY ALVES VIEIRA","ERIELSON HENRIQUE DOS SANTOS","EUZIMAR DE OLIVEIRA MARTINS","FABRICIA ALVES DE ALMEIDA SILVA","FELICIA MARIA FERNANDES DE OLIVEIRA","FERNANDA ROSA DA SILVA MARCHETTI","FERNANDO SILVA DA CRUZ","FILIPE BARROS DA SILVA","FLAVIA LINHARES PEDROZO","FLAVIA TIBURTINO DE ANDRADE SALES","FRANCIANE LIVIERA MATHIAS","FRANCIELE THOME","FRANCINE KREUSCH","FRANCISCA GRACIETE MATIAS DA SILVA","FRANCISCO JOBIELSON DA SILVA","FRANCISCO JOSENILDO DE LIMA BARRETO"] },
+            { id: 30, nome: "FATIMA DE LURDES B. DA ROSA", total: 52, ativos: 35, inativos: 17, cursistas: ["AMANDA CRISTINA MARCHETTO","BRUNA CARPES ARNEZ","CRISTINA RAQUEL GOMEZ FERNANDES", "GILDETE CARDOSO SANTOS","IZABEL CRISTINA MACEDO AMARAL","JESSICA LEAL SOARES","JOSEFA TAMARA SOUZA DA SILVA","JOSENILDO MANOEL SANTOS VIEIRA","KARINNE NASCIMENTO SILVA","KATIELI STASIAK DA CUNHA","KELI OLIVEIRA VIEIRA","KELLY CRISTINA BITANTI CORREA","KELLY HARUMI RODRIGUES NAGAMORI","KETLEN LUNA DOS PRAZERES PORTO PEREIRA","KLEBER F BARROS","LARA NIEDERAUER MACHADO","LAURA AGUILARA DA ROSA RIBEIRO","LAURA NANDREA DE SOUZA BRITO","LAUREN DE OLIVEIRA OZORIO","LAZARO CABRAL DE BEM","LEILA CRISTINA MARTINELLI","LENON SILVEIRA DE SA BRITTO","LENY GOMES MARTINS","LEONIR MOREIRA DA COSTA","LESSANDRA BARBOSA FLORES","LIGIA WOUTERS ANTONOV","LIOLENE SAYONARA MUSTARI DA ROSA","LISIANE LAUREANO PIRES","MARICELMA DOS SANTOS OLIVEIRA", "MARILZA CONSTANSI","MONICA MARIA FRAZAO BRITO CERQUEIRA","PEDRO DE SANTANA SANTOS","QUELEN SIMONE PEREIRA","RAYSA DIAS NAKANAK","SIMONE MUNIZ PUYO"] },
+            { id: 31, nome: "FERNANDA LIMA SEVERO", total: 94, ativos: 32, inativos: 62, cursistas: ["JOCELENE SILVEIRA AQUINO","JOICE DA LUZ LOPES","JOSEANE EUGENIA DA SILVA GOMES","JOSEARA CAMPOS BREHM","JOSEILDO SILVESTRE DA SILVA","JOSELAINE OLIVEIRA RODRIGUES","JOSIANE DA SILVA RAMOS LIMA","JOSIANE GUEDES DA SILVA","JOSICARLA NORONHA","JOSIQUIELI RAMINELLI","JOSLEY CAVALLI DE LIMA","JOSUE DA CRUZ DINARTE","JOVANA FALLAVENA VAZ","JOVANA RODRIGUES CARDOZO","JOZEANE MONTERO MAUTONE","JULIA BEATRIZ DA SILVA SANTOS SARAIVA","JULIA DA CUNHA STOELBEN","JULIA GABRIELA RAFFAELLI PAVINATTO","JULIA HERBERTZ","JULIANA AMARAL","JULIANA PUNTEL PASQUALOTTO", "JULIANA ROBERTA WEIDE","JULIANE BORTESE","JULIANO FERREIRA DE LIMA","KACELINE BORBA DE OLIVEIRA GONCALVES","KAREN CRISTINA CAPRARA","KARINE DE SOUZA MEDINA","MARINA FARIAS PEIXOTO","MARLY SALES CARNEIRO","MILENE VILELA LELIS RODRIGUES","NATALIA APARECIDA MAXIMIANO SOUZA DA SILVA","NAZHA RACHID EL KADOUM"] },
+            { id: 32, nome: "FRANCILEIDE DOS S. COSTA", total: 71, ativos: 30, inativos: 41, cursistas: ["ADRIANA MILBRATZ","ALINY ARANTES DA SILVA GOMES","ANDERLIZE SAPIEZINSKI DE AVILA","ANDREA DOS SANTOS ARAUJO","ANDYARA KAREN DE FREITAS SILVA","ANNA RAYSSA GONCALVES DOMINGOS","ARIANO OLIVEIRA LEMOS","CLARICE FATIMA DAL MEDICO","CLAUDIO ROBELIO DA TRINDADE","CLEBERTINA PARENTE DE SOUSA","CRISTIANE DA SILVA POMPEU","DANIEL DA SILVA LEONCO","DANIEL SILVA DE MEDEIROS","DANIELA MACANEIRO","DANUZIA MATIAS DOS SANTOS","DENISE COELHO","ESEQUIEL TONIAL","FRANCIELY SA VARGAS","JOELDES VANDA KUHN TAUBE","JULIANA DNENFER VENANCIO","JULIANA GOMES PIOLOGO","JULIANA MARIA RAMOS SAUMA","JULIANA PLETES DE BORBA","JULIO CEZAR PIRES SOUSA","JUSSELINO VIEIRA DO NASCIMENTO","KAMYLA LOHRANY AMORIM PEREIRA","KASSIANA APARECIDA RIBEIRO ARAUJO","KATIA SAFFAR SHINZATO BRANDAO","LAILA DE ANDRADE MACIEL","LIANDRA PEDROSO LENCINA MACHADO"] },
+            { id: 33, nome: "FRANCIMARA PEREIRA DA SILVA", total: 51, ativos: 29, inativos: 22, cursistas: ["ADILSON FERREIRA DOS SANTOS","ADRIANA DA CRUZ SANTOS","ADRIANA SANTOS VOIGTEL DE OLIVEIRA","ALESSANDRA CONCEICAO COELHO ORTEGA","ALESSANDRO BARRETA GARCIA","ALINE OLIVEIRA MOLENZANI","AMANDA DELA ROSA PASSAIA","AMANDA JORRI DE TOMEI","AMANDA ROCHA CARDOSO KOCH","AMANDA SIMOES FEITOSA","ANA CLAUDIA NUNES DE MELO","ANA LUIZA RODRIGUES BIONDO","ANALY RANTIQUIERI VIEIRA DA SILVA","ANDREA DUARTE DA CUNHA ROSA","ANDREA PEREIRA DE CARVALHO","BEATRIZ SANTOS","CAMILA APARECIDA SOUZA SANTOS","CARLA MOREIRA DE PAULA PRADA","CLARICE DE OLIVEIRA CHILE","CLAUDIA DEL VALLE SILVA","CLAUDIA REGINA SOUZA COSTA DE ARAUJO","GABRIELA BRANDALISE BEHENCKE MOLLERI","GABRIELA PICHANI GOMES","GABRIELI APARECIDA LORENSON PIROLA","GARIBALDE MONTEIRO NEPOMUCENO JUNIOR","GEONAR DO NASCIMENTO SILVA","GEOVANA PRADO BORGES","GERUSA DETONI","GERY ODAIR RICCI"] },
+            { id: 34, nome: "GABRIELLA DE OLIVEIRA RANGEL", total: 67, ativos: 33, inativos: 34, cursistas: ["ERANY DA SILVA DOS SANTOS","FABIA ELIZABETE XAVIER PINTO","FABIANA MURICI CECCACCI CINTRA","FABIO AZEVEDO RODRIGUES","FLAVIO ALVES DA SILVA","FRANCISCA AUDECI VIEIRA FELIX","FRANCISCO FABRICIO FEITOSA FERREIRA","FULVIO ROBERVAL LOPES","GABRIELA GOMES SALVADOR","GABRIELA MARQUES DE SOUZA","ISA FERREIRA MARTINS","JANAINA BIANCA DA COSTA ANDRADE","KATIA VITORIA SANTOS COELHO","LAIZ CANUTO TAVARES PERRO","LUCIANA PAULA GOMES KEMMUPP","LUCIANA PEREIRA DE ARAUJO","MARIA REGINA SOARES ALONSO","MARINERI VIEIRA DOS REIS CARVALHO","NILZIMAR HIGINO PEREIRA","PATRICIA MARIA DOS SANTOS NUNES","PATRICIA RENATA RIBEIRO PEREIRA VIDAL","PRISCILLA NAZARETH CHAVES SAO BENTO","SUANE DE PAULA CAMILO","TAMIRIZ IARA DE OLIVEIRA","TATIANE SCHENA","THUANY CARDOZO E CARDOSO","VALDEMIR PERSCH SOBRINHO","VALDERES DE OLIVEIRA LUCAS","VALNEI TAVEIRA LOPES","VANDERLEI ALVES BENTO","WALLACE DE SOUSA DOS SANTOS","VALDIRENE DA SILVA MUNIZ",
+"THAIS DESIREE RAMIRES FRAGA"] },
+            { id: 35, nome: "GEILTON FERREIRA DE MELO", total: 45, ativos: 34, inativos: 11, cursistas: ["ADRIANA CHRISTINA DA COSTA","ALCIVANDO PAULO DE SOUSA","ALDO BATISTA DE AZEVEDO JUNIOR","ALINE CRISTINA DE LUCENA","ALINE JUSTINO DE SOUSA GIL","AMANDA CARLA COSTA SOBREIRA","ANA CLEIDE GOMES DA SILVA","ANA GABRIELLE PINTO DELFINO","ANA PAULA DE BRITO LIRA","ANDRE ALVES DE MORAIS","ANDRE LIMA CANDEIA","EBORE LORRANY RODRIGUES DE OLIVEIRA CANDIDO","JESSICA BARBOSA","JULIANA APPEL MORTARI","LUANA CONCEICAO MOREIRA","LUCAS HERMES DO NASCIMENTO","MARIA DO SOCORRO COSMO BATISTA","ORLANDO BRITO CAMPOS","OSEAS FELICIO DE LIMA SOBRINHO","OTAVIO DOS SANTOS PEREIRA","PATRICIA DOS SANTOS","PATRICIA FERNANDA NOVAES FERREIRA MARQUES","PATRICIA FLORES DA SILVA","PATRICIA GODOI","POLLIANA MENDES DE OLIVEIRA","RACHEL SANCHES DE BARROS BOIA","RAFAEL GOMES DITTERICH","RAUL LUCAS SANTOS DE SOUZA","REGIANE DE SOUZA ALVES","RENATA CARMONA DA SILVA","SILMARA ALCANTARA DA SILVA","TACYLLA MARIA RIBEIRO DOS SANTOS","TERESINHA DE SOUSA NOBREGA","WANUSA DA SILVA OLIVEIRA SOARES"] },
+            { id: 36, nome: "GIORDANA RODRIGUES CHAVES", total: 70, ativos: 33, inativos: 37, cursistas: ["EMILENY SOARES OLIVEIRA SILVA","ESDRA CAINNE COSTA PENA","FABIANA DA SILVA STEDILE","HEIDIMAR FRANCA MACHADO","HELENA DOS SANTOS PAZ","IEDA MARIA MASSUQUINI DA SILVEIRA","INGRID BALKE","INGRID CATIUSCIA SANTOS CAETANO","IOHANA OTTO DE OLIVEIRA","IONE SCHVAN ZAWASKI","ISIS CORREA DE MENEZES","IUCARA NUNES RANGEL","IVANA BATISTA DA SILVA PEREIRA","IVANE TEREZINHA GOMES FAGUNDES","IZAURA SOUZA FREITAS","JACQUELINE DA SILVA BRAGA","JAMILE SULEIMAN SHAMA","JANAINA MONTEIRO","JANICE DIAS OCANA","JAQUELINE BARBIERI GORROSTERRAZU","JAQUELINE CAMARGO SENA REGIO","JAQUELINE MOREIRA CAVALHEIRO","JAQUELINE PANDOLFO RUHMKE","JAYNNE DA COSTA ALVES DE CASTRO","JENNIFFER DE CAMPOS PIEROBOM","JESSICA OLIVEIRA DA SILVA","KELI FRANCIELI BEZERRA","KELLY FERREIRA DA SILVA","LARINE THEISEN","LARISSA MOREIRA","LAURA DA SILVA","LAYSA DA SILVA FARIAS","LIZANDRA RODRIGUES MEDEIROS"] },
+            { id: 37, nome: "HELDER PABLO JUSTINO DE LIMA", total: 51, ativos: 33, inativos: 18, cursistas: ["ANA BEATRIZ SANTOS ALVES DE NOVAIS","ANA LUIZA SANTOS MEIRELES","GIOVANNA PAOLA GOMES DE CARVALHO","IRACEMA DOS ANJOS","ISABELA DOS SANTOS","JADISON DOS SANTOS","JEVERSON DOS SANTOS ROCHA","JOANA DARC PEREIRA DOS SANTOS","JOSEFA DE LISBOA SANTOS","JULIANA SANTANA ALVES","JUSSARA BADO MULLER","JUVANCI GOMES FILHO","KAIO BRENO TSALIKIS BARBOZA","KAMILLA NASCIMENTO LIMA","KARLOS PHILIPPE DO NASCIMENTO ALVES","KASSIANE ZANOTTO","KATIA PREDEBOM","KATIA REGINA CAETANO DA SILVA","KATIUSCIA MELQUIADES MACEDO","KELER SALETE PERUZZO","KELI REGINA FRANCA VINCENCI","KELVIN ALEXANDRE DOS SANTOS","LARA BISSIATO DE SOUZA","LORENA MARIA BORGES SILVA","LUANA MESSIELLE SILVA DA MOTA","MARCELO SILVA SANTOS MORAES","MARIA FRANCISCA SOARES DA SILVA","MARIA IVANADJA DOS SANTOS","MOIZETE DE OLIVEIRA SANTOS","NATHALIA GABRIELA DOS SANTOS MATOS","NAYANE DE JESUS OLIVERA SILVA SANTOS","NELMIRES FERREIRA DA SILVA","PATRICIA FERNANDES ALVES"] },
+            { id: 38, nome: "IAMARA DA SILVA P. BRITO", total: 77, ativos: 32, inativos: 45, cursistas: ["ALANA OLIVEIRA CINTRA PEDREIRA","ANA CRISTINA FRANCO","CAMILA PAIXAO SILVA ALVES","DARCK SANTOS LIMA","FABIO ENRI UGOSKI BAZILI","GEISA DA SILVA MACHADO","GRICIENE BISPO DOS SANTOS", "HELEN NASCIMENTO DE JESUS","IRIS SANTANA DE JESUS","ITAMAR DA SILVA DANTAS","JEOVANE ARAUJO CARVALHO","JIRLENE MOREIRA DOS SANTOS","JOERINA GOMES LESSA NOUGUEIRA","JOHNNIE ELTON MACHADO DOS SANTOS","JOSEVALDO SANTANA DE JESUS JUNIOR","JUCINEIDE SILVA SUARES","JULIANE MACEDO SANTOS SILVA","LARA RIBEIRO DO VALE E PAULA","LIDIA ROCHA NUNES","LIDINEA DE OLIVEIRA VIEIRA","LILIAN BEZERRA COUTO","LOVER JOAO CA","LUAN MAIDANA SOARES","LUCIA HELENA DAL POZ PEREIRA","LUCIANA LEITE DA CUNHA","MARA REJANE NUNES DE CARVALHO","MARCELO LIMA DE ALMEIDA","MARCIA SIQUEIRA DE BARROS","MARCILENE DA SILVA GOMES AZEVEDO","NATALI GARIM MENESES","RENATA SANTANA DE JESUS","SARA DOS SANTOS"] },
+            { id: 39, nome: "IRENE DE ALMEIDA BRAZ ", total: 55, ativos: 42, inativos: 13, cursistas: ["ANTONIA DA CRUZ ROSA ARAUJO","FRANCIELE DE OLIVEIRA NUNES","FRANCIELI BACKES","FRANCIELI SIMIONI DA ROCHA","FRANCINE MENDONCA DA SILVA","GABRIELA BORGES CARDOSO","GABRIELA BRASIL SEVERGNINI","GABRIELLE SANTOS BARCELOS","GABRIELLY DE BOER DE OLIVEIRA","GERALDINE MONTEIRO RUFFATO","GIANE DORNELES MONTEIRO","GIOVANA CHAGAS CANTARELI","GIRLEY RIBEIRO","GISELE APARECIDA DO AMARAL","GISELE VENDRAMIN","GLAUCIA MARIA SPESSATO","GRACIELE RODRIGUES RIBEIRO","GRAZIELA VALLI TEIXEIRA","GRAZIELI TEREZINHA CLERICI","GREGORY AQUINO CABRERA","GUILHERME CONCEICAO","HALINE CAVALHEIRO DE VARGAS","LETICIA SEICEIRA FERREIRA","LILIANE SABINO DOS SANTOS","LUANA VANESSA PEREIRA","LUCIANE DE MATTOS BINS","LUCIANE NEVES RIBEIRO","LUIZA CRISTINA NASCIMENTO DA SILVA","MARIA CLARA DOS SANTOS","MARIA CLARA SANTOS DENTE","MARIA EDUARDA DELGADO GUERRA","MARTA CASTRO COSTA","ONESIMO ORLANEY DOS SANTOS PEREIRA","PAOLA RIZZI MORENO SANTOS","PAULA MAGNA ALMEIDA MINERVINO","RAILANE SOARES DE OLIVEIRA","RILMA PEREIRA DA SILVA","RODRIGO CIRINO MENDES","SORAIA SOARES DA SILVA","TAUANE ROCHA DA SILVA","VALQUIRIA LIERGE DE MELO RAMALHO","VANESSA SOARES ALVES NASCIMENTO"] },
+            { id: 40, nome: "ITALO RUAN TAVARES SAMPAIO", total: 79, ativos: 33, inativos: 46, cursistas: ["ALANA PATRICIA SANTOS SERIO","ANA GRAZIELA SOUZA DE MATOS","ANNA KARINA GONCALVES XAVIER","EDMILSON PEREIRA DA COSTA","ELISEU MANDUCA ATAIDE FILHO","FLAVIA DE MELO FIDELIS","IONARA FERNANDA FREITAS","KAROL JEFESSOM ALVES DE SOUSA","LEUDE RODRIGUES PRADO","LUANA LEITE MEDEIROS","LUARA PATRICIA CARNEIRO LIMA","LUCAS ANDRADE SANTANA","LUCAS DE CARVALHO SIQUEIRA","LUCIANA DA LUZ DIAS","LUCIANO PADILHA AURELIO","LUCINEA SANTOS DE AGUIAR","LUCINEIDE DA SILVA BRAGA","LUNNE NUNES ASSIS SILVA","LUZIMAR DE SOUSA OLIVEIRA ARAUJO","LUZINETE DE PAULA PINTO DA SILVA","MAIARA SIQUEIRA","MARTA QUITERIA AQUINO DE BRITO","PAULO CESAR BATISTA SANTANA","ROSEMARI DALL AGNOL","ROSIANE BISPO SILVA","ROSIANE DUARTE DE SOUZA GONCALVES", "ROSIMERE MOREIRA","ROSIMERI SOUZA GOULART", "ROSINEIDE DOS SANTOS GUIMARAES","SAIONARA TAINE MARQUES CALIXTO","SANDRA EDELMIRA ROSA MOTTA","SANDRA LETICIA DOS SANTOS GONCALVES","SAYONARA CARDOSO ANTUNES MELO"] },
+            { id: 41, nome: "JANAINA DANTAS DOS SANTOS", total: 62, ativos: 35, inativos: 27, cursistas: ["ADRIANA ELIAS DE OLIVEIRA","ALEXANDRE MELO DINIZ","ALINE CARLA DOS SANTOS","ANTONIA HELENA DIAS","ANTONIO AGNALDO DA SILVA","AURIELY PACHECO FERNANDES","DIOGO GANDELMAN DA SILVA CELESTINO","ERICKA CLEOPATRA DOS SANTOS","FERNANDA GABRIELLE DA SILVA CRUZ","GABRIELA SILVA CHAVES","HELOISA BRIGIDO RODRIGUES","ILANA DA SILVA LIMA","JOAO PAULO DA SILVA FERNANDES","KARINE SEFRIN SPERONI","MARIA EDUARDA DE LIMA RODRIGUES","NOELMA DE OLIVEIRA SANTOS","PATRICIA ALVES DOS SANTOS","RAICCA MONTEIRO PRATA","RAQUEL SILVA VAZ SANTOS","ROCHANNA MARIA RODRIGUES DOS SANTOS","ROSALINA GUARIERO DE OLIVEIRA","ROSELY FIRMINO ANDRADE BARBOSA","SAMYRAH PASSOS MARTINS","SHIRLENE BERETTA DE LIMA SANTOS","SILVANE BUASKI","SILVANETH OLIVEIRA RIBEIRO","SIMONE NUNES FRANCISCO","SINVALDA REGINA SOARES LIMA","SONIA DORISETE ZATTI","SUSANA MARIA POSSENTI","TANIA GLADIS DOS SANTOS MEDEIROS","THAIS CARDOSO ARAUJO","VALERIA APARECIDA PEREIRA CANDIDO","VERUSKA MESQUITA DE SOUSA MORAZOTTI","WGERBESSON FREIRES MACIEL BEZERRA"] },
+            { id: 42, nome: "JANICE DE MELO MACHADO", total: 69, ativos: 33, inativos: 36, cursistas: ["BRUNA MENDONCA","BRUNO ROCHA LIMA","CALLINE DOS SANTOS MARTINS","CAMILA GAWLINSKI PREUSSLER","CAMILA KERLI MARTINS DOS SANTOS","CAMILA NUNES BORGES","CAMILA OLIVEIRA DE SOUZA","CARINE MACHADO DA LAPA BALDISSERA","CARLA CRISTINA COSTA","CARLISE CHRIST","CARLOS ALBERTO DE SOUZA HABERLAND","CARME NEIDE FIAMONCINI","ELISANGELA TAUFFER","ELIZANDRA MAGALI QUEVEDO FERRAO","ELIZANDRA MEDIANEIRA GROSS","ELONICE OLIVEIRA MACHADO","EUZEBIA DALLAGNOL BARUFFI","FABIANA EVALDT BERTOTI","FABIANA LETICIA SILVEIRA","FABIANA PINTO GONCALVES","FABIANE CHIELLE MIOTTO","FABIANE FAGUNDES DE SOUSA","FABRICIO FELIPE QUADROS","FATIMA VALDERES VIANA MACHADO FARIAS","FERNANDA LEAO BAUMART","FERNANDA ROCHA LEMOS","FERNANDA SOUZA DA SILVA","FLAVIO SILVESTRI SCHIMITH","GABRIELA PEREIRA FRIC","GABRIELLA LUCIA DE OLIVEIRA CABRAL GONZAGA","GERALDA ELIANE DIAS","GIVALDO FREIRE DE OLIVEIRA","ISA DA SILVA VILHENA"] },
+            { id: 43, nome: "JOSELITA ALVES DA SILVA", total: 75, ativos: 24, inativos: 51, cursistas: ["ALESSANDRA PEREIRA DIAS","ANDREIA TRINDADE FERREIRA DA COSTA","ANDRESSA RODRIGUES BRUM","ANDRIELE MARIANO DA SILVA","ANELISE LAUX KUBISZEWSKI","ENI DE MELLO SIQUEIRA","FRANCISCO DE ASSIS LUCAS DE OLIVEIRA","GABRIEL BEZERRA SILVA","GABRIELA REJANE SILVA DE MEDEIROS","GENICE MARIA XAVIER DA SILVA","GILLIARDE COSTA DE OLIVEIRA","HELLISSAMAYA MICHELLY SILVA DE OLIVEIRA","HOMERO HENRIQUE DA SILVA","JANAYNA CRISTINA DA SILVA MAGALHAES","JEANE FERREIRA ALVES","JOANA DARC JUSTINO GOMES DE SOUZA","JOHNNYS RODRIGUES DINIS DA SILVA","KELLY CRISTINA DE SOUZA AZEVEDO","MARCIA MARTINS TEIXEIRA DA SILVA","MARCILENE ROSA DA SILVA BILHEIRO","MARIA ANGELA DOS SANTOS TEIXEIRA RIBEIRO","MARIA DA CONCEICAO SOARES DE SOUSA","MARIA JESSICA SOARES SANTOS LEIE","RAFAELA DE MARTINO FONTES DANIEL"] },
+            { id: 44, nome: "JOSIELHE GONCALVES SOARES", total: 46, ativos: 32, inativos: 14, cursistas: ["DANIELA SILVEIRA LOUREIRO","DANIELA SOUZA DA ROSA OLIVEIRA","DANIELE DE FREITAS SCHUSTER","DANIELE SILVA","DANIELLE VIEGAS WOLFF GUTERRES","DANIELLI DA SILVA LOPES","DARLA SILVANA FANFA DE OLIVEIRA","DENISE DA COSTA SILVA","DIEGO DE MATOS NORONHA","EDENIR DIAS MUNHOZ","EDILENE OLIVEIRA RODRIGUES","ELAINE DALL AGNOL","ELAINE ZANCHET BEDIN","ELIANA DUARTE","ELIANE LOFGREN PRATES","ELIANE MOREIRA DA SILVA","ELISANA DE OLIVEIRA","ELISANGELA DA SILVA CABRAL","ELISANGELA LIRA DE SOUZA","LUCIENE DE SOUSA ANDRADE","PATRICIA ORTIZ SALDANHA","RENATO PEREIRA AURELIO","SANDY BAZAN ACEVEDO","TIAGO SANTOS DE SOUSA","TUANI CARDOSO PEREIRA","VANDEILMA SOUZA DA GRACA","VANESSA NUBLING","VICTOR HUGO CHIRICHELLA FELICIONI NAPOLEAO","VIKTORIA BRAGA LEITE","WAGNER VIANNA NASCIMENTO","YAGO BESERRA MARINHO MARTINS","YKARO KAUA SOUSA"] },
+            { id: 45, nome: "JOSIVAL A. DOS SANTOS JUNIOR", total: 42, ativos: 26, inativos: 16, cursistas: ["ADRIANA ELIDA SOARES DA SILVA","ALEXANDRE CARLOS NOGUEIRA SILVA","DEBORA BISPO DE FRANCA","EDIE ALINE SOARES SANTOS FONTES","EVELYN VIVIANE DOS SANTOS MOTA","EVENNY DIAS ARAUJO","GABRIELA FEITOSA SANTOS SOUSA","GABRIELA GOES COSTA","GILMARA HENRIQUE LIMA","GISLEIDE SANTANA SANTOS","GLEDSON SANTOS DORIA","HELENA MYKAELLE ROCHA MOURA","IARA CONCEICAO DOS SANTOS","INGRID ROSANE GOMES DOS SANTOS","ITALO LIRA GARRIDO","JAIRLAINE FEITOSA SANTOS","JANAINA ALVES DA COSTA","JOAO PEDRO ALVES FERREIRA GOMES DE OLIVEIRA","JOCELMA GOMES OLIVEIRA","JOSE ALENILSON S DE OLIVEIRA","KEROLLEN MARIA JOSE REZENDE DA SILVA","LEILA GERTRUDES SILVA DINISIO SANTOS","LIVIA MARIA SANTOS DA HORA","LUCIANA BATISTA DOS SANTOS","MACILENE MOREIRA MATOS AZEVEDO DE SOUZA","MARIA CRISTINA SANTOS"] },
+            { id: 46, nome: "JULIANE REIS MAIA DA SILVA", total: 52, ativos: 32, inativos: 20, cursistas: ["ANDRESSA SOARES BITANCORT","ANE CAROLINE COUTINHO NUNES","CAMILA BOZZA MONTANARI","CRISTIANE MATOS DO CARMO","DEOMAR DIAS DE OLIVEIRA","DILMA PUCCI","ERICA ROSSANA ANDRADE MICHELIN","HUMBERTO LUIZ MAIA DA COSTA","IRENE HILDA BAPTISTA VIEIRA","JANAINA LOPES CORREA","JOSINEIA DE QUEIROZ BRAZ OLIVEIRA","JULIANA MENEZES FLORES","LARISSA GOELZER DA COSTA","MARCIA CRISTINA DOS SANTOS JUPI","PABLO PERES PEREIRA DA SILVA","PAMERA PATRICIA SILVA BARROS","PAOLA BASTOS MICHELIN","RAFAELLE STEFANE ELIAS ALVES","RAYSSA RAQUEL FELIPE RIBEIRO","RENILDE NUNES DE SOUSA","ROSIMAR RIBEIRO","ROSMARI DE FATIMA FABRIS MARTINS CLARO","SAMANTHA DOS SANTOS TOLEDO","SEUNICE DE SOUZA MELLO MONTAGNA","SILVIO DA ROCHA FARIAS","SIMONE DA ROCHA OLIVEIRA BOHLKE BOHLKE","SUZANA MARQUES CLAUDINO MOTA","TALITA OLIVEIRA SOUZA","TALYSSA DA SILVA FHR","THAYANA PARANHOS PORTAL GOMES","VANESSA MONTEIRO DE ALMEIDA DAVILA","WINNIE JESSICA ALMEIDA SILVA SANTOS"] },
+            { id: 47, nome: "KILMA C. FERREIRA GUEDES", total: 42, ativos: 29, inativos: 13, cursistas: ["ALUISIO JOEL CALDAS AZEVEDO","ANA MARIA MORAES VIEIRA","ANA MEIRE CASTRO PINHEIRO","ANDREA CORREA DE SOUZA","ANGELINA ANDRADE DUARTE DE SOUZA","ANTONIA CLEONICE PEREIRA DA SILVA","CAMILA ANDRADE NONATO DE ALMEIDA","CINTIA RODRIGUES DOS SANTOS","CLEIDE PAULINO DA SILVA","DANIELLA LIMA GONCALVES","DINA SILVA PIRES REIS","DIONIZIO DE CASTRO VICENTE","ELCINEI MEDEIROS MAGALHAES","ENA MARA NUNES RIBEIRO","EZACLAIDE GONZAGA SATURNINO","FABIOLA SANTOS NEVES","FABIOLLA EMANUELLE SILVA VILAR","FERNANDO SILVA DE MATOS","FLAVIO DA SILVA NEVES","FRANCISCA TEIXEIRA DA SILVA","SIMONE LIMA DE MACEDO","SOLANGE DA CONCEICAO TORRES","SOPHIA LEGUICA DE PAULA PESCE","SUELEM MENDES DA SILVA QUARESMA","SUSANE ANDRADE RODRIGUES","TALISSA RENATA CONDIEW JACOB","THAIS MARINHO CARVALHO DA COSTA","THIAGO FACCO CAMARGO","TIAGO PEREIRA DOS SANTOS LIMA"] },
+            { id: 48, nome: "LETICIA RAMIRES CORREA", total: 56, ativos: 24, inativos: 32, cursistas: ["ADRIANA GIOVANNINY LEGUIZAMON","ALESSANDRA MOHR","ALIFER PEDRO SALVADOR","AMANDA LUIZA RODRIGUES RIVAROLA","ANA PAULA LUNELLI DA SILVA","CLARIANE AREZI GLAPINSKI","CLAUDIA CAMPOS WALTER","CLAUDIA CRISTINA LUDWIG DOS SANTOS","CLAUDIA DE SOUZA BARCELOS","CLAUDIA SILVANA MACHADO PINTO RIBEIRO","CLAUDIO LUIZ LOEBENS","CLEO VEDANA ZANLUCHI","CRISTIANE BITENCOURT GARCIA","CRISTIANE DA ROSA ROSA","CRISTIANE LOPES DA ROSA","CRISTIANO CABREIRA PEREIRA","CRISTIANO SOTO DE MORAIS","CRISTINE COSTA RODRIGUES","DANIA DARIZA PEREIRA CANDIDO","DANIEL DE SOUZA LEMOS","DANIELA FERREIRA MARQUES RIBAS","DANIELA LEAL ANTUNES TEIXEIRA","DANIELA PIOVESAN DE SOUZA","JUZELIA FLORES BOCAIUVA"] },
+            { id: 49, nome: "LIDIANE DA ROSA THOMAZ", total: 51, ativos: 29, inativos: 22, cursistas: ["ANDREIA MARTINS GOMES","ANDREIA SILVEIRA PEREIRA DAS NEVES","ANDRESSA ROSSETTO STAFFORTI","ANGELA MARIA ROSSI","ANGELA RAQUEL MORAES PALOMEQUE COELHO","ANGELA REGINA PINTO CASANOVA","ANGELICA FALABRETTI","ANGELICA MOREIRA DA ROSA","ANNA CAROLINA MUNIZ ORDOBAS","ANNA CAROLINA SALDANHA COUTO","ARIANA DA SILVA PEIROT","ARLENE KURRLE NOGUEIRA","ARTUR CUSTODIO DA SILVA","AUGUSTO VALERIO CESAR DE OLIVEIRA","AUREA CACAPIETRA ZORZELLA","BARBARA LOPES DE VITES","BEATRIZ FAGUNDES BICA","BRUNA OCANA CASTRO","BRUNA VIEIRA CARDOSO","CAMILA PEREIRA BOTELHO","SUELLEN SOARES FERREIRA PEREIRA","VANIA BUENO BRONZONI","VEREDIANA SEBERINO","VERONICA DE CASTRO GONCALVES","VERONICA FREITAS CERQUEIRA","VIVIAN CRISTINA ALVES DE CARVALHO","VIVIANE CARES DE SOUZA","VIVIANE GERONIMO DA SILVA","WENDEL FRAGOSO DOS SANTOS"] },
+            { id: 50, nome: "LISYARA L. G. DE C. DA ROSA", total: 54, ativos: 27, inativos: 27, cursistas: ["CARLA ADRIANA CARRETTS DE SOUZA","CARLA FERNANDA PIRES","CARLA NUNES MOREIRA","CARLA OLIVEIRA","CARLA SIMONE VALENTE DE SOUZA","CARMEM VANUSA FONTES BELMONTE","CARMEN BEATRIZ SANTILLAN","CAROLINA MARTINS CARDOZO","CAROLINE BECHER MOURA","CAROLINE DA CUNHA SILVEIRA","CAROLINE HOCHMULLER MUHLBEIER","CAROLINE NEVES MATOSO","CASIANE FATIMA BERNARDI","CHRISTIAN GERALDO TECHERA RODRIGUES","CHRISTIAN SILVA DE CASTRO","CHRYSTIANE JARDIM OLDANI","CIBELE MACIEL DA SILVA","CINTIA DILCEIA SOARES","FRANCILENE CEZAR GONCALVES SILVEIRA","JOSIVANIA ALEXANDRE DA SILVA DOURADO","LEANDRO CAJUELA LOPES","LEIDIANE PINTO SANTANA", "LEILIANE GOUVEIA DE OLIVEIRA","LESLYE COSTA","LETICIA DUTRA CHAVES","LIA FERNANDA DE CAMPOS","MARIA ERONILDES DA SILVA SA"] },
+            { id: 51, nome: "LIZIANE DE AVILA OLIVEIRA", total: 46, ativos: 30, inativos: 16, cursistas: ["ADRIANA DE MELO BEVILACQUA","ADRIANA DOS SANTOS","ADRIANA HAGEMANN DALTROSO","ALAN MACIEL GUTERRES","ALANA CLAUDIA MOHR","ALESSANDRA MELLO VALADARES VESSOZI","ALEX CARTANA OLIVEIRA","ALINE BAIRROS SOARES","ALINE GARTNER","ALINE SABBADO MACIEL","ALINEMAR MARCON","ALYCE IBRAYMA NUNES BITENCOURT","ANA BREGALDA","ANA CARLA MACIEL MARTINS","ANA CIBELE MORAIS LARRUSCAIM RIBEIRO","ANA CLAUDIA FAGUNDES FAGUNDEZ","ANA ELIZABETHI MONJELO RIBEIRO","ANA PAULA DE MENEZES MARTINS","ANA PAULA RODRIGUEZ OLIVERA CHARAO","ANA PAULA SILVEIRA BARRETO","ANA PAULA SOARES CEZAR","ANDREIA GEREMIAS BRUST","CARMEM LUCIA SIMOES SILVEIRA","ELIZA IGNACIO DE OLIVEIRA","EMILY GABRILLY MEDEIROS AZEVEDO","FABIANA DUARTE DOS SANTOS","FABIANA ZULIANI","FATIMA BEATRIZ PAZ","FATIMA CATARINA BORGES PERES ALVES","GABRIELA DA SILVA CAMPOS DA ROSA DE MORAES"] },
+            { id: 52, nome: "LUCIA RODRIGUES NEVES", total: 78, ativos: 34, inativos: 44, cursistas: ["ADRIANA ABREU DA SILVA","CRISTIANE SANTOS BULSING","ELIANE GONCALVES GODINHO","IZABEL CRISTINA DE JESUS ANDRADE","KAJEAN MARCELINO DE SOUSA","KELEN DA SILVA DIAS","LIGIA VACCARI DA SILVA","LILIAN DACHI SIMOES PIRES","LIZETE SALAZAR KILLES PEIXOTO","MAITE GUIMARAES PINTO","MARIA DE FATIMA SIMOES DE OLIVEIRA","MARIA DO ROSARIO EMIDIO DE PONTES","MARIA JULYENDER DA SILVA SANTOS","MARIA MARLI DE MENESES","MARIA REGINA CLEMENTE DE OLIVEIRA","MARLA DAIANE DA SILVA DA CHAGAS","MARLI LUCIA SCHWENGBER SCHAEFER","MARLUCE ECHEVESTE TELES","MATHUSALEM DE OLIVEIRA","MAURICIO GREGORIO DE SOUSA SOARES","MILENE DE OLIVEIRA SANTOS","MONICA VENTURA CORVIELLO","NAGILA DINIZ RIOS SANTOS DA SILVA","NATALIA GIFFONI DE ALBUQUERQUE","NOELCI TERESINHA DE ARAUJO BAREA","NOELIA PENA","ORLANDO DE LIMA MONTEIRO","PABLO GOMES DO NASCIMENTO","PAULA DAIANA COSTA QUINTEROS","RAFAELA MACHADO BRAZ","RAISA MONIQUE DA SILVA FAGUNDEZ","RENI SALETE DA ROCHA BUSNELLO","SILVANA SUAREZ SILVA","SILVIA LUCIANA TABAREZ MOREL"] },
+            { id: 53, nome: "LUIZA VIEIRA DA COSTA", total: 39, ativos: 25, inativos: 14, cursistas: ["ALINE CASTILHOS TEIXEIRA","ALTERIO JOSE TROIAN","ANA CASSIA MOREIRA DA SILVA","ANDREIA BITENCOURTE","GISELLY TUANNY DE SOUSA SANTOS","ISABEL CRISTINE FERNANDES DE MELO","JAIANE SOARES PACHECO ALVES","JAIRA OLIVEIRA GUGIA","JAIRANE KARLA SOARES GOIS","JANAINA RIBEIRO DA SILVA","JARDELINA MARIA MARQUES DA SILVA","JESSICA COSTA CARDOSO","JESSICA LETICIA SANTANA PACHECO","JOANA AMELIA BARROS ALMEIDA PAZ","JOSE AIRTON DE HOLANDA","JOSEANE DA CRUZ RAMOS","JUCILEA BAIAO DE SOUZA","KENIA MARIA DA SILVA NUNES CARDOSO","LEANDRO VALENTE AMORIM","LETHICIA RODRIGUES DE Q","LIDYANE COSTA FEITOSA","LINDALVA DO NASCIMENTO COSTA SOUSA","LORENA LOPES BONFIM","LUCIANA BORGES NUNES","LUCIANA SILVA SANTOS"] },
+            { id: 54, nome: "MARIA ELOIZA CASTRO THOMAZ", total: 82, ativos: 36, inativos: 46, cursistas: ["ALINE DO NASCIMENTO SOUZA","BIATRIZ COSTA FEIJO","CARMILENE DE MACEDO SILVA","DANIELA MACHADO DE ASSIS","DEISE MATEUS DA SILVA","DENISE SOUZA FARIAS","EDVALDO CARDOSO DA SILVA","EVA VANIA FREITAS SANTOS","FERNANDA TRINDADE DUTRA DE ALMEIDA","FERNANDA VELOSO SARAIVA","FRANCISCO ERNANDES SOBRINHO","FRANCISCO JHONNATA DA SILVA MONTEIRO","FRANCISCO PEREIRA RODRIGUES DA SILVA","GABRIELA SILVA LIMA","GILMARA GAMBIN TRINDADE","GISELA APARECIDA ALVES","GISELE SODRE GUALBERTO","GROCIELA BONADEO","HELEN CRISTIANE DA ROCHA GUIMARAES DIAS","ILCA MENDES VALE","JACINTO XAVIER DA SILVA JUNIOR","JACKELINE SOUSA DA SILVA","JANAINA LUZZIN LEITE","JOANA APARECIDA DA SILVA DE CASTRO","MARIA DAIANA RODRIGUES DE OLIVEIRA","PABLO HENRIQUE SILVA DOS SANTOS","PATRICIA MENEZES","PATRICK SENA OLIVEIRA","PAULO LIMA MOREIRA VASCONCELOS","PRISCILA VERONICA GONCALVES GRANELLA GANTUS CARDOSO","QUEREM EVELYN DA SILVA PEREIRA","RAILTON FERNANDES DE MOURA","RAISA RODRIGUES DOS SANTOS","RAPHAEL DE OLIVEIRA SALGADO","LILIANE DO NASCIMENTO NERI","FRANCISCA RAIZA NUNES VIEIRA"] },
+            { id: 55, nome: "MARIANA CAETANO ALCANTARA", total: 68, ativos: 34, inativos: 34, cursistas: ["ALLOMA BORGONHA SANTOS","DANIELA GOMES DE FREITAS","GEANE DE SOUZA SILVA","GIANNY EMANUELLY ZUGE FRANCO","GICELI SIMONE DA SILVA MARQUES","GILVANILSON DO NASCIMENTO DE MELO","GISELE PIEDRAS WIENKE","GISELLE ARRUDA MARQUES MORAIS","GISLAINE GOULART MINUZZI","GLAUCIA PERAZZOLI","GLICERINALDO DE SOUSA GOMES","GRAZIELE VALENTE DE FREITAS","GUSTAVO DE OLIVEIRA MOREIRA","HELEMERCE SOARES LEDESMA","HELGA CORREA DAL BO MARIN","JUCIELLY VIANA GLORIA", "LISIANE CAVALHEIRO DUTRA DOS SANTOS","MARIA ROCIANE DE ALMEIDA SILVA","MARLISON SOARES GOMES","MARLY MARIA DOS SANTOS","MATEUS DE SOUZA DUARTE","NAGEANE SOARES DO NASCIMENTO","NELSON ALVES PEREIRA NETO","NELSONEIRY PEDROZA DIAS","OZENEI DA SILVA NUNES","OZIAS BRITO FREITAS", "RANI MARIA DE PAULA OLIVEIRA","REGINA ALMEIDA DA SILVA","RENATA BIANCA OLIVEIRA FREIRE","ROSANGELA EMILIA MASSA LANA","SANDERLY DACIO NUNES","SUELDA DE PAULA SOUZA","VALDINEI JESUINO RIBEIRO","VIVIANE CORREA DE SOUZA"] },
+            { id: 56, nome: "MARILENE M. C. B. RODRIGUES", total: 67, ativos: 36, inativos: 31, cursistas: ["CAYO VINICIUS MORAIS LIMA","CICERA ALVES DE SOUSA","DANILA FREIRE DE OLIVEIRA SILVA","DEMARCIO SIMAO GONCALVES","DIANA MARIA DA SILVA SOUSA","DIANA SOUTO SILVA","DOCELINA WANIA DE OLIVEIRA NUNES","EDSON DE SOUZA LIMA","ELINE CLAUDIA FERREIRA DA SILVA","ELISANGELA DE OLIVEIRA SOUSA","EMANUELLA RODRIGUES PAIXAO REGIS","EMILY SILVA DE SOUZA","ENILDA MARIA COELHO DA SILVA","FERNANDA ROSANGELA DA SILVA","JOSIANE ROCHA CEZARINO","JOSIMERI RAIDER DE ALMEIDA","JOSSILY HIANNY MARQUES LOPES","JOYCE KAROLLINE DA SILVA MELO","JOYCE SEABRA DE VASCONCELOS", "JULICE PINTO DA COSTA SILVA","KARINA RODRIGUES ROSA","KARLA MICHELLE CABRAL FRANCA AZEVEDO","SCHEILA BARBOSA","SCHEILA FATIMA FRIZZO PEGORARO","SEBASTIANA NASCIMENTO DE QUEIROZ","SEDILENE BALDISSERA","SERGIO ROBERTO PIRES DE SOUZA","SHEILA SCHIERESZ DE SOUZA RAMIRO","SHIRLENE DOS REIS PEREIRA","SIAMARA MEIER","SILMARA DA NOBREGA OLIVEIRA FARIAS","SILVANA GIOVANONI RIBEIRO BOLLER","SILVANE SOLIGO RODRIGUES","SILVER POSTIGLIONI","SILVIA ADRIANA DUTRA GOULART","SIMARA CARDOSO SANDIM"] },
+            { id: 57, nome: "NATALIA ESTELA A. BRANDAO", total: 49, ativos: 36, inativos: 13, cursistas: ["ANDRESSA INGRID MARIA VIEIRA SOBRINHO","ANNA KAROLINE VIEIRA DE SOUSA","ANTONIA DA SILVA ROCHA","ANTONIO DE JESUS ROCHA","BRENDA WANESSA DA PAZ SANTOS","BRUNA VIRGINIA SANTOS LIMA","CARMEN CELIA BATISTA SOBRINHO VILARINHO","CATIA REGINA DE CASTRO SANTOS","CECILIA GABRIELLE DE OLIVEIRA BRITO","CICERA MARIA ANGELICA GOMES","CLAUDIO JOSE DOS SANTOS CASTRO","CLEUDIMAR CARDOSO","DANILO DE LIMA TAVARES","DEJANILDES CABRAL RIBEIRO","EDEILTON GARCES DE OLIVEIRA","ELEDILSON ARAUJO","ELIDONETE SAMPAIO ALVES","ERIKIANE APARECIDA DE SOUSA E SILVA","FERNANDO CARLOS CUNHA MASCARENHAS DE ARAUJO","FRANCELINA DE OLIVEIRA GOMES","FRANCIELTON DE SOUSA","GERCIANA MARIA MOTA","HERVANIA PATRICIA RAMOS DOS SANTOS LOPES","HIBRAIM VARGAS TOGESKI","HYEDDA GONCALVES RAMOS SOBRINHA","IANCA THAIS BRICIO SANTOS","IDI CARLA SANTOS DE ARAUJO","IEDA KYVIA CRUZ DA SILVA","INDIARA DOS SANTOS DIAS","IONARA CHAMURRA DA SILVA","IRINA TAINA DEL CASTILLO ROSA","ISABEL CRISTINA GUIMARAES BERTUOL","ISABEL CRISTINA PAES KOHAGURA","ITAJANA MINUZZI","IVANIA FERREIRA DA SILVA","SILVANIA ALVES MARTINS"] },
+            { id: 58, nome: "NATALIA MARIA DA SILVA SANTOS", total: 45, ativos: 27, inativos: 18, cursistas: ["ANA MARIA ARAUJO LUNA MOREIRA","ANA PAULA DE FREITAS GOMES","ANDREA KARLA DE LACERDA SIQUIERA CAMPOS","ANDREA LOUREIRO ROGES","ANGELA FERNANDA BARBOSA COSTA SILVA","AURELIANE CADENGUE GALINDO","BRUNA DE JESUS OLIVEIRA","BRUNA TALYTHA SOUSA DE LIMA","CAIO RENATO TAVARES DA SILVA","CARMEN DOLORES PRATES BUREGIO DE LIMA","GUSTAVO PEREIRA MACEDO","JOSEFA JAQUELINE DA SILVA","NATANAEL MANOEL DA SILVA","RAQUEL DOS SANTOS PAES","RAQUIEL NUNES CALDEIRA SANTOS","RAYANNE ROCHA MARCELINO","RAYELLE FERREIRA DA SILVA","REGIANE SANTOS DE JESUS LIMA","REJANE DA COSTA ANTONIO","RENATA KELLY ALVES DE CARVALHO VASCONCELOS","RENATA PEREIRA VENTURA","RENATA RANGEL DE FARIA","RENATTA GRACIELA DE SOUZA ALNEIDA","RITA DE CASSIA DE JESUS BAOVENTURA","RONAN GOERL","RONILDA PERRUPATO","ROSANA FERREIRA DUARTE"] },
+            { id: 59, nome: "NATAN EVANGELISTA DA SILVA", total: 49, ativos: 31, inativos: 18, cursistas: ["ANTONIO BISPO DE OLIVEIRA NETO","ELAINE AMORIM QUIRINO","ELIANE COUTINHO BUBOLZ","ELSON BORGES BRAGA","EVANIZE SCAPIN CARGNIN","FRANCISCA ISRAELDA RODRIGUES NUNES","FRANCISCO GEAN LEITE DO NASCIMENTO","GESSICA MARQUES MOURA","GILDILENE RODRIGUES DA SILVA","GILNEIDE CARVALHO DOS SANTOS COSTA","ILIDIA ALVES SILVESTRE","ISAAC BARBOSA DOS SANTOS","ITACY DANIELLE DA SILVA HUERGO","JANETE CARNEIRO DE MIRANDA","JEANE DAS NEVES SILVA DOS SANTOS","JESSICA PRISCILA GOMES PINTO","JOSE ARMANDO FERREIRA DE LIMA","JOSE RUAN PEREIRA ROSENO","JOSELIA CARLA DA SILVA LIMA","JULIA GARCIA VIEIRA SILVA","KEROLIN SILVA TEIXEIRA","LARISSA CERQUEIRA MELO BRUNO","LEANDRO DA SILVA GONCALVES","LUCAS ANDRADE SANTOS","MACICLEIDE SILVA JORGE","MARIA APARECIDA BEZERRA DOS SANTOS","MARIA JOSE REJANE OLIVEIRA ALMEIDA","MARIA ROSE LIMA DOS SANTOS","MAYARA PEREIRA SANTOS","PAULA EVANGELISTA SANTOS SOUZA","REBECA VITORIA ALVES DE MATOS"] },
+            { id: 60, nome: "NAYARA C. DA SILVA CORDEIRO", total: 73, ativos: 38, inativos: 35, cursistas: ["ADNA PEREIRA CONCEICAO DE OLIVEIRA","AGLAIDE DE MAGALHAES DA SILVA","ALEJANDRA LUZARDO COSTA","ALENE VIEIRA LINS","ALESANDRA PEREIRA BATISTA","ALESSANDRA BATISTA DE MATTOS","ALESSANDRA CILENE ABRAMOWICZ MACHADO","ALEXSANDRA MORAES DA SILVA SILVA","ALIANE DE OLIVEIRA SANTOS SOARES","ALINE FRAGA DE OLIVEIRA","ALINE SILVA DOS SANTOS","ALINE TATIANE GALDINO","ALISSANDRA DE LIMA ANASTACIO","ANA CAROLINA FERREIRA DE MIRANDA","ANA CAROLINA GONCALVES DO NASCIMENTO","ANA CAROLINA GUSMAO FERREIRA","ANA CLAUDIA DA CONCEICAO","ANA CLAUDIA H SCHERER","ANA CRISTINA MOTA DA COSTA CUNHA","ANA FLAVIA CORREA LEAO","ANGELICA SILVA E SOUZA","ANTONIA SANTOS SILVA","ANTONIO SOUZA ANSELMO","APARECIDA REGINA SILVA SANTOS","BIANCA FONTES MELO","CAREN CILENE DOS SANTOS","CARICIA CRIS SILVA MARTINS","CINTIA COSTA GALVAO BRAZ RIBEIRO","CIRENE ASSIS MACHADO","CRISTINA ALVES DA COSTA","DAISE GUIMARAES ABREU DE MATOS","DIRLEY DE OLIVEIRA LOPES","EDILENE DE SOUZA COSTA","ESTELINA DE SOUZA ARAUJO","KEDIMA PANTOJA VIANA","LIDIA MARIA MARTINS GONCALVES","PAULO ELIAS GUIMARAES CURSINO","THIAGO SOUZA"] },
+            { id: 61, nome: "PATRICIA F. CAVALHEIRO", total: 69, ativos: 27, inativos: 42, cursistas: ["GISSELLE DOS SANTOS OLIVEIRA","GLAUCIANNY GONZAGA DE MORAES","GRACIENE MATOS LOPES","IZABEL CORREIA DOS SANTOS MONTEIRO","IZABEL CRISTINA FERREIRA VIEIRA","IZOLENE PASTORINI TROMBINI","JACI CONCEICAO DA SILVA D AVILA BORBA","JACQUELINE IRACEMA JACINI SAUER ONOFRE","JAMILES FERNANDES NEVES","JANAINA FERREIRA DE LIMA E SILVA","JANETE NIRLIA DA COSTA","JAQUELINI EVANIZI PEDRO","KARLINE DE CASTRO LIRA TELES","KATIANA FARIAS SOARES","KATIANNE COSTA LOPES","LUCIANA DA SILVA SIMOES","LUCIANO COELHO CORDOVIL","MARCIA COSTA DE LIMA","MARCIA PATRICIA BARROS BRUNO PINHEIRO","MARIA LETICIA DOS SANTOS","MARIA LUIZA RODRIGUES DA SILVA","MARIA NATALIA BORRAS DE JESUS","MARIA NEULICELIA COSTA MARQUES","MARIA ROSIMEIRE NEGREIROS DA SILVA","MARIA SOLENE ROSA LEAL","MEURI CRISTIANE BATISTA DOS SANTOS","MICHELI MIGUEL SANTOS SILVA"] },
+            { id: 62, nome: "PEDRO EULA MARQUES", total: 60, ativos: 33, inativos: 27, cursistas: ["ALINE RODRIGUES DA CUNHA","ANDRESA MARIA VALENTE FONTOURA","ANGELA CAMARGO VARGAS","ARIANA BRITO DE SOUZA SANTOS","CARLOS HENRIQUE REIS DA SILVA","CLAUDIA DE ALMEIDA BAYER OLIVEIRA","DANIELLE LOTOWSKI ALIAGA","DIESSICA SANTOS DA SILV","ESLEN GIOVANA DA SILVA CORDEIRO","FABIANI TERESINHA STIEVEN","JANICE MARIA MAZZOLA MARTINS","JOYCI GABRIEL DE OLIVEIRA","JULIANA DE PAULA FERRAZ DO AMARAL","LEILA TAIS KUNTZLER PEDROTTI","LUCIENE ALVES DE SOUSA","MAIRA TAVARES DE OLIVEIRA","MARIA APARECIDA RODRIGUES PRIMO LACERDA","MARIA NISSE ALVINO DE FARIAS","MAYANI GOMES ALVES LIMA","MICHELE DE FREITAS RODRIGUES","MICHELLI DE ABREU STREGE DOS SANTOS","NEUZELI DE LINICA DOS SANTOS MACEDO","NILCILENE COSTA SANTOS","NIRLA TAIS MACHADO LIMA","OTACILIO ALVES DA SILVA","PATRICIA BARBOSA DA SILVA","PATRICIO PEREIRA TEIXEIRA","RANNA EMANUELLE ALMEIDA","RENATA MARIA BROETTO","SONIA MARI KIKUCHI NAGANO","TATHIANA DOS SANTOS WAGNER","THALITA APRIGIA DA SILVA LIMA","VERONICA LOPES ALVES DUARTE"] },
+            { id: 63, nome: "RAVENA PEREIRA LEITE", total: 71, ativos: 28, inativos: 43, cursistas: ["AMANDA CRISTIANE ROSSATTO FACCO","CARMEM MENDONCA NOBRE","CARMEM SILVIA DE QUEVEDO PADILHA","CARMEN DORA AVILA DA SILVA","CASSIANA APARECIDA SBARDELOTTO","CHIARA GOES BARBOSA","CINARA CHARAO DE MELO","CINTHIA DA SILVA","CINTIA DECKER","CLACI FATIMA FERRAZ","IVSON LUIS RIBEIRO GUIMARAES","LAIS LUCIANI DE OLIVEIRA LESSA","LORENA LAIS DA SILVA SOUSA","MAICON DE LIMA SOARES","MARCELO DE OLIVEIRA SANTA ROSA","MILENE WOJAHN NICOLA","ROXANA AMANDA DA SILVA PENNO","SANDRA HORIZONTINA DA SILVA DOS SANTOS MASSEN GONCALVES","SHEILA CRISTINA SCHLOSSER SALVATTI","SILVIA ALESSANDRETTI","SIMONE ANTUNES DA SILVA","SIMONE MARAFIGA DEGRANDI","SIMONE VIERO NOGUEIRA PEREIRA","SIRLENE ANCHIETA DE MOURA","SIRLENE SEGATI","SOLANGE DA CUNHA FONSECA","SOLANGE SAICOSKI ALVES","STEFANIE DA RONCH"] },
+            { id: 64, nome: "RENATA MENEZES DE JESUS", total: 68, ativos: 37, inativos: 31, cursistas: ["ALSANDRA OLIVEIRA NASCIMENTO","CATARINA MENEZES DE JESUS FERREIRA","FABIANA LEAL DA COSTA TRISTAO","FERNANDA CRISTIANE DE SOUZA","GABRIELA COELHO MARQUES","GRAZIELE SOARES DA SILVA","IZABEL CRISTINA DA SILVA","LIVIA RENATA CORREA DE SOUZA","LUCEI ALVES MARTINS","MARA ALICE AVELAR SARAIVA HORTA","QUITERIA MARIA DOS SANTOS","ROGERIO PACHECO BRAS","ROSANGELA DA SILVA SOUZA FERREIRA","ROSELI RODRIGUES DOS SANTOS DA SILVA","ROSEMARI PACHECO TEIXEIRA","ROSIANE SIMOURA CASTELO","ROSYANE LESSA DE SOUZA","RUTH MENDES DA SILVA VIANA","SANDRIELI FRANCA PECK","SAYDE DA SILVA XAVIER","SELMA LUZIA ARNOUR DA SILVA","SILFRIDO JOSE DIAZ MARTINEZ","SIMONE FERREIRA DE SOUZA DE MENEZES","SIRLENY RODRIGUES LIMA","SONIA MARIA FERREIRA MACEDO","SUENIA AGUIAR DE MIRANDA","SULAMITA CAVALCANTI PEREIRA MOREIRA","TATIANE SILVEIRA VIVIAN","TELMA CRISTINA PEREIRA DAS NEVES","THAIS SILVA DE OLIVEIRA","THYAGO NUNES OLIVEIRA","TOMIRIS KATIA SOUZA DUARTE","VANIA DOS SANTOS MOREIRA","VIVIANE CRISTINA DA ROSA FRANCES","WALQUIRIA TEODORO","XANGRILA SIBELI CAMARGO BRABO","YURI HARLEN VASCONCELOS"] },
+            { id: 65, nome: "RODRIGO SOARES DIAS", total: 80, ativos: 34, inativos: 46, cursistas: ["ALEXANDRE ACCIOLY MAGALHAES SANTOS","CLEICA SANTOS","CLEIDI MARA DOS SANTOS","CLEITON DE ANDRADE SPARREMBERGER","CLEONICE NUNES SOUSA","CRISTIANA POLTRONIERI ZIEHLSDORFF","CRISTIANE DAROSSI PETRY","CRISTIANE DE SA COELHO ALVES","CRISTIANI MASSUCHETTI FRONZA","CRISTINA DOMINGUES COSTA","ERICA OLIVEIRA DE SOUZA","JANAINA DE ARAGAO NASCIMENTO","JOYCE CASSAGUERA DE ASSIS","JOYCE CRISTINA RODRIGUES DE OLIVEIRA","KARINA DA PAZ PIMENTA","KELLY CRISTINA RIBEIRO VENTURA","KESSYA SOUZA DOS SANTOS SILVA","LAZARO JOSE DE ABREU JUNIOR","LILIAN DE ASSIS MONTEIRO LIZARDO","MAILSON SANTOS PEREIRA","MARCELA CRISTIANE DE BARROS","MARIEDLA RODRIGUES SOUZA AMARAL","MARITELMA DE SIQUEIRA","MICHELLY SOUZA LIMA KULPEL","MONICA FRANCESCHETI","NATALINA BISPO DOS SANTOS DIAS","NATHIELLY ROBERTA JANUTTE DOS SANTOS","PATRICIA APOLINARIO BERTOLUCCI","RENNYSON MARLON DA CRUZ CORREA","RICARDO DAMASCENO DE LYRA","RODRIGO MATIAS MONTEIRO","SANDRA SANDRE COIMBRA","TIAGO DO NASCIMENTO COSTA","VINICIUS PEREIRA VAZ"] },
+            { id: 66, nome: "ROSANE SOARES DE OLIVEIRA", total: 43, ativos: 28, inativos: 15, cursistas: ["ALEXANDRE MAIA DE OLIVEIRA","ANA CRISTINA DA COSTA ALVES","ANA CRISTINA DIAS DA SILVA","APARECIDA DE OLIVEIRA FRANTELMO CAVALHEIRO","CAIO DA COSTA CANDIDO ROSALLA","CAMILA OTTONI DE ALMEIDA","CARLA SOARES DE SOUZA SAMPAIO","CASSIA REGINA ALVES BRAZIL","CLAUDIA SOUZA DA SILVA","DAIANA BRAZ MOREIRA","IGOR PORFIRIO DA SILVA COSTA","KATY ALESSANDRA DA SILVA CAPPATO DE SOUZA","KEVIN DRUMOND VIANA","KILMARA JANICE VIEIRA DE SA CANDIDO","KLEDJA EMILLY DO NASCIMENTO","LAIS BORGES LACERDA","LANA GUIMARAES DOS SANTOS","LAURA CRISTIANE PEREIRA","LILLYAN STEPHANY AGRA ANDRADE","LIVIA TAIS CORREA DE AVILA","LIVIAN MARIA DA SILVA PINHEIRO","LUANA ALVES ARAUJO","LUANA MARA PEREIRA MORENO","LUCIANA GESTEIRA","LUIS PAULO LIMA DE BRITO","LUZ MARINA THEODOLDI COSTALONGA","MICAELY REGINA ANDRADE SANTOS AQUINO","TIAGO LUIZ RODRIGUES DA SILVA"] },
+            { id: 67, nome: "SILVIA R. DE SOUZA A. DE SOUZA", total: 52, ativos: 35, inativos: 17, cursistas: ["ADRIANA CLAUDIA RIBEIRO DA SILVA RODRIGUES","ALEDIR OLIVEIRA SOUTO","ANA PAULA VIANA OLIVEIRA","AURILENE BABORSA BATISTA LIMA","CLAUDIA MARIA DE LUCENA VASCONCELOS DE CARVALHO","DAISE CLENES DA SILVA FERNANDES","EDIARLLEN PATRICK ALVES CRUZ","EZAQUIEL SOUZA DA SILVA","GIOVANNA CAMARGO REIS","HELEM QUEILA NOVAES DOS SANTOS PINTO","IONE MARQUES","IRADYS LIMA DE OLIVEIRA","LEIDMAR BASTOS LIMA COELHO","MARAICA GOMES DOS SANTOS","MARIA DA LIBERDADE CAVALCANTE MELO","MARIA SULLIVAN CAMPOS COSTA","MARIANA RODRIGUES ALVES","MARILAINE DO NASCIMENTO GAIER","MARILEIA CANI","MARINEIDE CARGNIN DE SOUZA","MARINELA RODRIGUEZ DA SILVA","MARIO ANTONIO DE SENA JUNIOR","MARISON ANTONIO SOUZA DA COSTA","MARISTELA VALERIA BATISTI","MARIZA PEREIRA PEREIRA","MARLEI TERESINHA DA SILVA DE MORAIS","MARLI BACKES DE SOUZA","MARLI MARTINS CORDEIRO","MARQUEDIANE BRUSAMARELLO ALVES","MAYELLY ARAUJO DA SILVA HOLANDA","SILVIA TERESINHA BOCASANTA","SIMONE DA ROSA KRUSSER","SINDIA FERREIRA LIMA","SUELI DA SILVA MARTINS","THIAGO TERRES"] },
+            { id: 68, nome: "TEYVIANNE RIBEIRO DE OLIVEIRA", total: 44, ativos: 25, inativos: 19, cursistas: ["ALLANIS BARBOSA SANTOS","ANA BEATRIZ NOGUEIRA DE OLIVEIRA SANTANA","ANA LIVIA DE SOUSA SARAIVA","ANA MARIA GOMES DE SOUSA MONTEIRO","ANA REJANE DA COSTA BARROS","ANA VITA DIAS CARVALHO PAES","GIULIA CORDEIRO DE ARAUJO ROCHA","HONORENE PEREIRA DA SILVA DIAS","JORDILENE PEREIRA MESQUITA","KALINNE DE SOUSA SANTOS","MARIA DALVA AVELINO DE SA","MARIA DAS GRACAS DA SILVA TORRES ANAISSE","MARIANE FONSECA SOUSA ALBUQUERQUE","NADIA CAROLINE BARBOSA SILVA","SANDRA CAMPELO LIMA","SUELI BORGES DE SOUSA NERES","SUZANE DA SILVA NEVES","TAISE SOARES PRUDENCIO","TALITA ASSUNCAO DE SOUZA PEREIRA SANDRINI","TATIANA DOS SANTOS SEQUEIRA","TATIANE NASCIMENTO SANTOS","THALITA ALMEIDA SEGUNDO DE LUCENA FERREIRA","THALYA EMANUELLE DA ROCHA ANTAO","THAYLA PEREIRA FARIAS","THIAGO ROCHA FERNANDES"] },
+            { id: 69, nome: "VALERIA PEREIRA DA SILVA", total: 82, ativos: 32, inativos: 50, cursistas: ["ALEXANDRE MISTURINI","CACILDA PEREIRA DA HORA","CELANE DA CUNHA MARTINS","EDSON DA SILVA SANTOS","ETELVIANE SOUZA","FRANCILVERA DA SILVA PEREIRA BARREIRO","IVANILDO DA SILVA NUNES","MANOELA CURCIO LESSA","MARIA ROSELEI CORTES","MATHEUS HENRIQUE DA SILVA MOTA","MAURICIA SANTOS FROTA","MICHELLE AMANDA MOTTA","MICHELLE PIRES SILVEIRA","MICHELLE ROSELEI FIORATO","MICHELLY DE LIMA ROLHANO","MIRTES AVELINO","MORGANI COSTA DA SILVA","NEYLA MAGALHAES DOS SANTOS","PABLO DA SILVA NUNES","ROBERTO ALVES DA SILVA","ROMILDO SANTOS VIEIRA","ROSELY LEMOS PEREIRA","SARAH SUAREZ DOS SANTOS","VALDENIA RODRIGUES TEIXEIRA","VALERIA MESQUITA DE SOUZA","VERONICA RODRIGUES DE OLIVEIRA","VINICIUS CORDEIRO DA SILVA","VIVALDO RIBEIRO DE MACEDO","WAGNER DA COSTA DIAS","WALESSA BENTES DE ALMEIDA","WALKIRIA DOS SANTOS","WASHINGTON DA SILVA GOMES"] },
+            { id: 70, nome: "YGOR SARKIS C. TEIXEIRA", total: 71, ativos: 38, inativos: 33, cursistas: ["ADRIANA GOMES VANDERVERT","ALINE STEFANI AMBROSINO DA SILVA FERREIRA","ALISSON THIAGO BARBOSA PEREIRA","AMANDA MARTINS VAQUEIRO RODRIGUES","ANA BEATRIZ ALVES GUIMARAES","ANA JANAINA FURTADO LACERDA","ANA PAULA DE LUCENA","ANA PAULA LORENCINI LIMA","ANA RACHEL ALVES DOS SANTOS SIEBRA","ANANDA ARAUJO ALVES","ANDREI DA COSTA CARVALHO","ANNA JENIFER SILVA DE PAULA VARGAS","BARBARA MAGALHAES NOGUEIRA","CAMILLA BRUNA RAMOS DE OLIVEIRA","CARLA APARECIDA GONCALVES BORGES ARRUDA","CRISTIANE RENATA BIESSECK KOLASSA","DANIELLE CRISTINA CONCEICAO DE OLIVEIRA TELES","DARLIELEN MACURAPE GOMES","DEYSE KELLY DOS SANTOS MELO DA SILVA","ELIETE SILVA CARVALHO DA CRUZ","EURIVAN MARQUES MESQUITA","EVANILDE MIRANDA DE FREITAS GUIMARAES","EVERTON ARAUJO DA SILVA","HELIDAVILA FERREIRA DOS SANTOS RIOS","IVETE CORREA FRAGOSO SAVIAN","IVETE SOEK RICARDO DE JESUS","JAILSON MORAIS CHAVES","JAMILA PINHEIRO DOMINGOS","JANETE JACINTA DE OLIVEIRA","JAQUELINE BEATRIS ZANELLA","JAQUELINE DE AGUIAR GAUDARD ARAUJO","JAQUELINE PIMENTA","JENIFER RANIELE VIEIRA DA SILVA","JOAO MARX CRAVO SALGADO","LIDIOMAR CASTELUBER DA SILVA","NATALY DE OLIVEIRA SOUSA","SUMAIA COSTA LIMA","SUSY COSTA DE ANDRADE"] }
+        ];
+
+        const processedData = tutorData.map(t => {
+            const percAtivos = ((t.ativos / t.total) * 100).toFixed(1);
+            return {
+                ...t,
+                percAtivos: parseFloat(percAtivos)
+            };
+        });
+
+        let currentData = [...processedData];
+        let currentSort = { field: 'id', dir: 'asc' };
 
         window.onload = function() {
-            fetchDataFromAppsScript();
-
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.filter-dropdown-container')) {
-                    closeAllDropdowns();
-                }
-            });
-
-            setInterval(() => {
-                fetchDataFromAppsScript(true);
-            }, 30000);
+            renderTable(currentData);
+            renderA4Table(processedData);
+            updateHighlights();
         };
 
-        async function fetchDataFromAppsScript(isBackground = false) {
-            try {
-                if(!isBackground) showToast("Buscando dados da planilha...");
-                
-                const response = await fetch(scriptUrl);
-                if (!response.ok) throw new Error("Erro na requisição ao Apps Script");
-                
-                const result = await response.json();
-                
-                if (result.error) {
-                    throw new Error(result.error);
-                }
-
-                if (result.headers && result.data) {
-                    tableHeaders = result.headers;
-                    tableData = result.data;
-                    renderDashboard();
-                    if(!isBackground) showToast("Dados sincronizados com sucesso!");
-                }
-            } catch (error) {
-                console.warn("Erro ao buscar dados:", error);
-                if(!isBackground) showToast("Erro ao conectar com a planilha.", true);
-            }
-        }
-
-        function renderDashboard() {
-            document.getElementById('stat-total-tutores').innerText = `${tableData.length} registros`;
-            renderTableHeaders();
-            renderTable(tableData);
-        }
-
-        function formatPhoneNumber(value) {
-            const numbers = String(value).replace(/\D/g, '');
-            if (numbers.length === 11) {
-                return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
-            } else if (numbers.length === 10) {
-                return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6, 10)}`;
-            } else if (numbers.length === 13 && numbers.startsWith('55')) {
-                return `+${numbers.slice(0, 2)} (${numbers.slice(2, 4)}) ${numbers.slice(4, 9)}-${numbers.slice(9, 13)}`;
-            }
-            return value;
-        }
-
-        function getConditionalColorStyle(percentVal) {
-            if (percentVal <= 33) {
-                return "background-color: #ef4444; color: #ffffff; font-weight: 600;";
-            } else if (percentVal <= 50) {
-                return "background-color: #f97316; color: #ffffff; font-weight: 600;";
-            } else if (percentVal <= 66) {
-                return "background-color: #facc15; color: #1e293b; font-weight: 600;";
-            } else if (percentVal <= 85) {
-                return "background-color: #a3e635; color: #1e293b; font-weight: 600;";
-            } else {
-                return "background-color: #10b981; color: #ffffff; font-weight: 600;";
-            }
-        }
-
-        // Função auxiliar para verificar se uma coluna é majoritariamente numérica
-        function isNumericColumn(headerName) {
-            const sampleValues = tableData.slice(0, 10).map(row => String(row[headerName] || "").trim());
-            const numericCount = sampleValues.filter(val => val !== "" && !isNaN(Number(val))).length;
-            return numericCount > 0 && numericCount >= sampleValues.filter(v => v !== "").length / 2;
-        }
-
-        function renderTableHeaders() {
-            const headerRow = document.getElementById('tableHeaderRow');
-            headerRow.innerHTML = '';
-
-            tableHeaders.forEach((header, index) => {
-                const th = document.createElement('th');
-                
-                // Centraliza automaticamente cabeçalhos de colunas numéricas ou específicas
-                let alignClass = "";
-                if (isNumericColumn(header)) {
-                    alignClass = " text-center";
-                }
-
-                th.className = `py-2.5 px-3 whitespace-nowrap relative filter-dropdown-container bg-slate-50${alignClass}`;
-                
-                const uniqueValues = [...new Set(tableData.map(row => String(row[header] !== undefined && row[header] !== null ? row[header] : "").trim()))].filter(v => v !== "").sort();
-
-                const currentFilter = columnFiltersState[header] || "";
-
-                th.innerHTML = `
-                    <div class="flex items-center justify-between gap-2">
-                        <span class="truncate">${header}</span>
-                        <button onclick="toggleFilterDropdown(event, ${index})" class="text-slate-400 hover:text-indigo-600 p-1 rounded transition cursor-pointer ${currentFilter ? 'text-indigo-600 bg-indigo-50' : ''}" title="Filtrar coluna">
-                            <i class="fa-solid fa-filter text-[10px]"></i>
-                        </button>
-                    </div>
-                    <div id="dropdown-${index}" class="hidden absolute left-0 top-full mt-1 bg-white border border-slate-200 shadow-xl rounded-xl p-3 z-50 w-56 text-slate-700 normal-case font-normal">
-                        <div class="text-[11px] font-semibold text-slate-500 mb-2 pb-1 border-b border-slate-100 flex justify-between items-center">
-                            <span>Filtrar: ${header}</span>
-                            ${currentFilter ? `<button onclick="clearColumnFilter('${header}')" class="text-indigo-600 hover:underline text-[10px]">Limpar</button>` : ''}
-                        </div>
-                        <div class="max-h-48 overflow-y-auto space-y-1 text-xs">
-                            <label class="flex items-center gap-2 p-1 hover:bg-slate-50 rounded cursor-pointer">
-                                <input type="radio" name="filter-${index}" value="" ${currentFilter === "" ? "checked" : ""} onchange="applyColumnFilter('${header}', '')" class="text-indigo-600 focus:ring-indigo-500">
-                                <span class="text-slate-500 italic">(Selecionar todos)</span>
-                            </label>
-                            ${uniqueValues.map(val => `
-                                <label class="flex items-center gap-2 p-1 hover:bg-slate-50 rounded cursor-pointer truncate">
-                                    <input type="radio" name="filter-${index}" value="${val}" ${currentFilter === val ? "checked" : ""} onchange="applyColumnFilter('${header}', '${val.replace(/'/g, "\\'")}')" class="text-indigo-600 focus:ring-indigo-500">
-                                    <span class="truncate" title="${val}">${val}</span>
-                                </label>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-                headerRow.appendChild(th);
-            });
-        }
-
-        function toggleFilterDropdown(event, index) {
-            event.stopPropagation();
-            const dropdown = document.getElementById(`dropdown-${index}`);
-            const isOpen = !dropdown.classList.contains('hidden');
-            
-            closeAllDropdowns();
-            
-            if (!isOpen) {
-                dropdown.classList.remove('hidden');
-                activeDropdown = dropdown;
-            }
-        }
-
-        function closeAllDropdowns() {
-            document.querySelectorAll('[id^="dropdown-"]').forEach(el => {
-                el.classList.add('hidden');
-            });
-            activeDropdown = null;
-        }
-
-        function applyColumnFilter(header, value) {
-            if (value === "") {
-                delete columnFiltersState[header];
-            } else {
-                columnFiltersState[header] = value;
-            }
-            closeAllDropdowns();
-            filterTable();
-            renderTableHeaders();
-        }
-
-        function clearColumnFilter(header) {
-            delete columnFiltersState[header];
-            closeAllDropdowns();
-            filterTable();
-            renderTableHeaders();
-        }
-
         function renderTable(data) {
-            const tbody = document.getElementById('dataTableBody');
+            const tbody = document.getElementById('tutorsTableBody');
             tbody.innerHTML = '';
 
-            if(data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${tableHeaders.length || 1}" class="p-6 text-center text-slate-400">Nenhum dado encontrado.</td></tr>`;
+            document.getElementById('visible-count').innerText = data.length;
+
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-slate-400">
+                            <i class="fa-solid fa-folder-open text-3xl mb-2 text-slate-300"></i>
+                            <p class="text-sm font-medium">Nenhum tutor encontrado para os filtros selecionados.</p>
+                        </td>
+                    </tr>
+                `;
                 return;
             }
 
-            data.forEach(rowObj => {
+            data.forEach((tutor) => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50/50 transition";
-                
-                tableHeaders.forEach((header, index) => {
-                    const td = document.createElement('td');
-                    
-                    // Centraliza células de colunas que contêm números ou porcentagens
-                    let tdAlignClass = "";
-                    if (isNumericColumn(header)) {
-                        tdAlignClass = " text-center";
-                    }
+                tr.className = "hover:bg-slate-50/80 transition text-slate-700";
 
-                    td.className = `py-2.5 px-3 whitespace-nowrap text-slate-700${tdAlignClass}`;
-                    
-                    let cellValue = rowObj[header] !== undefined && rowObj[header] !== null ? String(rowObj[header]) : "";
-                    
-                    const normalizedHeader = header.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                    
-                    const isPhoneCol = normalizedHeader.includes("telefone") || normalizedHeader.includes("celular") || normalizedHeader.includes("whatsapp") || normalizedHeader.includes("fone");
-                    const isTrilhaCol = normalizedHeader.includes("produto") && normalizedHeader.includes("trilha");
-                    const isPercentageCol = normalizedHeader.includes("media") || normalizedHeader.includes("porcentagem") || normalizedHeader.includes("%") || (!isNaN(Number(cellValue)) && Number(cellValue) <= 1 && Number(cellValue) >= 0 && cellValue.includes("."));
+                const isHighEngagement = tutor.percAtivos >= 50;
+                const badgeClass = isHighEngagement 
+                    ? "bg-cyan-50 text-cyan-700 border-cyan-200" 
+                    : "bg-amber-50 text-amber-700 border-amber-200";
 
-                    if (isPhoneCol && cellValue.trim() !== "") {
-                        td.innerText = formatPhoneNumber(cellValue);
-                    } else if (isPercentageCol && cellValue.trim() !== "") {
-                        let num = Number(cellValue);
-                        if (!isNaN(num)) {
-                            let percentVal = num <= 1 ? num * 100 : num;
-                            let formattedPercent = percentVal.toFixed(2).replace('.', ',') + '%';
-                            let styleAttr = getConditionalColorStyle(percentVal);
-                            td.innerHTML = `<span style="${styleAttr} padding: 4px 8px; border-radius: 4px; display: inline-block; text-align: center; min-width: 75px;">${formattedPercent}</span>`;
-                        } else {
-                            td.innerText = cellValue;
-                        }
-                    } else if (isTrilhaCol) {
-                        const valLower = cellValue.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-                        let badgeClass = "";
-                        
-                        if (valLower === "entregue") {
-                            badgeClass = "bg-emerald-600 text-white px-2.5 py-1 rounded-md font-medium text-[11px] inline-block";
-                        } else if (valLower === "nao entregue") {
-                            badgeClass = "bg-amber-400 text-slate-900 px-2.5 py-1 rounded-md font-medium text-[11px] inline-block";
-                        } else if (valLower === "nao disponivel" || valLower === "nao se aplica") {
-                            badgeClass = "bg-slate-500 text-white px-2.5 py-1 rounded-md font-medium text-[11px] inline-block";
-                        }
-
-                        if (badgeClass) {
-                            td.innerHTML = `<span class="${badgeClass}">${cellValue}</span>`;
-                        } else {
-                            td.innerText = cellValue;
-                        }
-                    } else {
-                        td.innerText = cellValue;
-                    }
-
-                    tr.appendChild(td);
-                });
-                
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-center font-mono text-xs text-slate-400">${tutor.id}</td>
+                    <td class="py-3 px-4 font-semibold">
+                        <button onclick="openModal('${tutor.nome.replace(/'/g, "\\'")}')" class="text-indigo-600 hover:text-indigo-800 hover:underline text-left transition">
+                            <span>${tutor.nome}</span>
+                        </button>
+                    </td>
+                    <td class="py-3 px-4 text-center font-bold text-slate-900">${tutor.total}</td>
+                    <td class="py-3 px-4 text-center font-bold text-cyan-600 bg-cyan-50/30">${tutor.ativos}</td>
+                    <td class="py-3 px-4 text-center font-bold text-amber-600 bg-amber-50/30">${tutor.inativos}</td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border ${badgeClass}">
+                            ${tutor.percAtivos}%
+                        </span>
+                    </td>
+                `;
                 tbody.appendChild(tr);
             });
         }
 
-        function filterTable() {
-            const globalQuery = document.getElementById('globalSearchInput').value.toLowerCase();
+        function abreviarNome(nomeCompleto) {
+            const partes = nomeCompleto.trim().split(/\s+/);
+            if (partes.length <= 2) return nomeCompleto;
 
-            const filtered = tableData.filter(rowObj => {
-                let matchesGlobal = true;
-                if (globalQuery) {
-                    matchesGlobal = tableHeaders.some(header => {
-                        let val = String(rowObj[header] || "").toLowerCase();
-                        return val.includes(globalQuery);
-                    });
-                }
+            const primeiro = partes[0];
+            const ultimo = partes[partes.length - 1];
+            
+            const meioAbreviado = partes.slice(1, -1).map(parte => {
+                if (['DE', 'DA', 'DOS', 'DAS', 'E'].includes(parte)) return '';
+                return parte.charAt(0) + '.';
+            }).filter(Boolean).join(' ');
 
-                if (!matchesGlobal) return false;
+            return meioAbreviado ? `${primeiro} ${meioAbreviado} ${ultimo}` : `${primeiro} ${ultimo}`;
+        }
 
-                for (let header in columnFiltersState) {
-                    const filterVal = columnFiltersState[header].toLowerCase();
-                    if (filterVal) {
-                        let cellVal = String(rowObj[header] || "").toLowerCase().trim();
-                        if (cellVal !== filterVal) {
-                            return false;
-                        }
-                    }
-                }
+        function renderA4Table(data) {
+            const col1 = document.getElementById('a4Column1');
+            const col2 = document.getElementById('a4Column2');
 
-                return true;
+            col1.innerHTML = '';
+            col2.innerHTML = '';
+
+            const half = Math.ceil(data.length / 2);
+            const dataCol1 = data.slice(0, half);
+            const dataCol2 = data.slice(half);
+
+            const createRow = (tutor, index) => {
+                const tr = document.createElement('tr');
+                tr.className = index % 2 === 0 ? "bg-white" : "bg-slate-50/60";
+                
+                const isHigh = tutor.percAtivos >= 50;
+                const percColor = isHigh ? "text-cyan-700 font-bold" : "text-amber-700 font-bold";
+                const nomeAbreviado = abreviarNome(tutor.nome);
+
+                tr.innerHTML = `
+                    <td class="py-0.5 px-1 text-center font-mono text-[9px] text-slate-400 border-r border-slate-100">${tutor.id}</td>
+                    <td class="py-0.5 px-1.5 font-medium text-slate-800 truncate max-w-[130px]" title="${tutor.nome}">
+                        <button onclick="openModal('${tutor.nome.replace(/'/g, "\\'")}')" class="text-indigo-700 hover:underline text-left truncate w-full">${nomeAbreviado}</button>
+                    </td>
+                    <td class="py-0.5 px-1 text-center font-bold text-slate-700 border-l border-slate-100">${tutor.total}</td>
+                    <td class="py-0.5 px-1 text-center font-bold text-cyan-600 bg-cyan-50/30">${tutor.ativos}</td>
+                    <td class="py-0.5 px-1 text-center font-bold text-amber-600 bg-amber-50/30">${tutor.inativos}</td>
+                    <td class="py-0.5 px-1 text-center ${percColor} border-l border-slate-100">${tutor.percAtivos}%</td>
+                `;
+                return tr;
+            };
+
+            dataCol1.forEach((tutor, idx) => col1.appendChild(createRow(tutor, idx)));
+            dataCol2.forEach((tutor, idx) => col2.appendChild(createRow(tutor, idx)));
+        }
+
+        function openModal(tutorNome) {
+            const tutor = processedData.find(t => t.nome === tutorNome);
+            if (!tutor) return;
+
+            document.getElementById('modalTutorName').innerText = `Cursistas de ${tutor.nome}`;
+            const listContainer = document.getElementById('modalCursistasList');
+            listContainer.innerHTML = '';
+
+            const listaCursistas = tutor.cursistas || ["Nenhum cursista cadastrado na listagem detalhada."];
+            
+            listaCursistas.forEach((cursista, index) => {
+                const li = document.createElement('li');
+                li.className = "px-3 py-2 bg-white rounded-lg border border-slate-200/80 text-xs font-medium flex items-center justify-between shadow-xs";
+                li.innerHTML = `
+                    <span class="text-slate-400 font-mono text-[10px]">${index + 1}.</span>
+                    <span class="flex-1 ml-3 text-slate-800">${cursista}</span>
+                `;
+                listContainer.appendChild(li);
             });
 
-            renderTable(filtered);
+            document.getElementById('cursistasModal').classList.remove('hidden');
         }
 
-        function refreshData() {
-            fetchDataFromAppsScript();
+        function closeModal() {
+            document.getElementById('cursistasModal').classList.add('hidden');
         }
 
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
-            const msgEl = document.getElementById('toastMessage');
-            msgEl.innerText = message;
-            
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('statusFilter').value;
 
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+            currentData = processedData.filter(tutor => {
+                const matchesName = tutor.nome.toLowerCase().includes(searchTerm);
+                
+                let matchesCategory = true;
+                if (category === 'high') matchesCategory = tutor.percAtivos >= 60;
+                else if (category === 'medium') matchesCategory = tutor.percAtivos >= 40 && tutor.percAtivos < 60;
+                else if (category === 'low') matchesCategory = tutor.percAtivos < 40;
+                else if (category === 'large') matchesCategory = tutor.total >= 70;
+
+                return matchesName && matchesCategory;
+            });
+
+            applySort();
+            renderTable(currentData);
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = 'all';
+            currentData = [...processedData];
+            applySort();
+            renderTable(currentData);
+        }
+
+        function sortTable(field) {
+            if (currentSort.field === field) {
+                currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.field = field;
+                currentSort.dir = field === 'nome' ? 'asc' : 'desc';
+            }
+            applySort();
+            renderTable(currentData);
+        }
+
+        function applySort() {
+            const { field, dir } = currentSort;
+            const multiplier = dir === 'asc' ? 1 : -1;
+
+            currentData.sort((a, b) => {
+                if (field === 'nome') {
+                    return multiplier * a.nome.localeCompare(b.nome);
+                } else if (field === 'total') {
+                    return multiplier * (a.total - b.total);
+                } else if (field === 'ativos') {
+                    return multiplier * (a.ativos - b.ativos);
+                } else if (field === 'inativos') {
+                    return multiplier * (a.inativos - b.inativos);
+                } else if (field === 'percentual') {
+                    return multiplier * (a.percAtivos - b.percAtivos);
+                } else {
+                    return multiplier * (a.id - b.id);
+                }
+            });
+        }
+
+        function updateHighlights() {
+            const sortedByEng = [...processedData].sort((a, b) => b.percAtivos - a.percAtivos);
+            const topEng = sortedByEng[0];
+            document.getElementById('highlight-top-engajamento').innerText = `${topEng.nome} (${topEng.percAtivos}%)`;
+
+            const sortedByVol = [...processedData].sort((b, a) => a.total - b.total);
+            const topVol = sortedByVol[0];
+            document.getElementById('highlight-top-turma').innerText = `${topVol.nome} (${topVol.total} alunos)`;
         }
     </script>
 </body>
