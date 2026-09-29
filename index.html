@@ -152,18 +152,16 @@
         }
 
         function getConditionalColorStyle(percentVal) {
-            // Gradiente idêntico ao Google Sheets enviado na imagem:
-            // Até 33% = Vermelho | 33% a 66% = Tons de transição (laranja/amarelo) | Acima de 66% = Verde
             if (percentVal <= 33) {
-                return "background-color: #ef4444; color: #ffffff; font-weight: 600;"; // Vermelho
+                return "background-color: #ef4444; color: #ffffff; font-weight: 600;";
             } else if (percentVal <= 50) {
-                return "background-color: #f97316; color: #ffffff; font-weight: 600;"; // Laranja
+                return "background-color: #f97316; color: #ffffff; font-weight: 600;";
             } else if (percentVal <= 66) {
-                return "background-color: #facc15; color: #1e293b; font-weight: 600;"; // Amarelo
+                return "background-color: #facc15; color: #1e293b; font-weight: 600;";
             } else if (percentVal <= 85) {
-                return "background-color: #a3e635; color: #1e293b; font-weight: 600;"; // Verde claro
+                return "background-color: #a3e635; color: #1e293b; font-weight: 600;";
             } else {
-                return "background-color: #10b981; color: #ffffff; font-weight: 600;"; // Verde forte
+                return "background-color: #10b981; color: #ffffff; font-weight: 600;";
             }
         }
 
@@ -173,7 +171,14 @@
 
             tableHeaders.forEach((header, index) => {
                 const th = document.createElement('th');
-                th.className = "py-2.5 px-3 whitespace-nowrap relative filter-dropdown-container bg-slate-50";
+                
+                // Centraliza os cabeçalhos das colunas B (index 1), C (index 2) e N (index 13)
+                let alignClass = "";
+                if (index === 1 || index === 2 || index === 13) {
+                    alignClass = " text-center";
+                }
+
+                th.className = `py-2.5 px-3 whitespace-nowrap relative filter-dropdown-container bg-slate-50${alignClass}`;
                 
                 const uniqueValues = [...new Set(tableData.map(row => String(row[header] !== undefined && row[header] !== null ? row[header] : "").trim()))].filter(v => v !== "").sort();
 
@@ -260,9 +265,16 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50/50 transition";
                 
-                tableHeaders.forEach(header => {
+                tableHeaders.forEach((header, index) => {
                     const td = document.createElement('td');
-                    td.className = "py-2.5 px-3 whitespace-nowrap text-slate-700";
+                    
+                    // Centraliza o texto das colunas B (index 1), C (index 2) e N (index 13)
+                    let tdAlignClass = "";
+                    if (index === 1 || index === 2 || index === 13) {
+                        tdAlignClass = " text-center";
+                    }
+
+                    td.className = `py-2.5 px-3 whitespace-nowrap text-slate-700${tdAlignClass}`;
                     
                     let cellValue = rowObj[header] !== undefined && rowObj[header] !== null ? String(rowObj[header]) : "";
                     
@@ -270,8 +282,6 @@
                     
                     const isPhoneCol = normalizedHeader.includes("telefone") || normalizedHeader.includes("celular") || normalizedHeader.includes("whatsapp") || normalizedHeader.includes("fone");
                     const isTrilhaCol = normalizedHeader.includes("produto") && normalizedHeader.includes("trilha");
-                    
-                    // Identifica colunas de média/porcentagem independentemente do nome exato se contiver números decimais entre 0 e 1 ou nome "média"
                     const isPercentageCol = normalizedHeader.includes("media") || normalizedHeader.includes("porcentagem") || normalizedHeader.includes("%") || (!isNaN(Number(cellValue)) && Number(cellValue) <= 1 && Number(cellValue) >= 0 && cellValue.includes("."));
 
                     if (isPhoneCol && cellValue.trim() !== "") {
@@ -279,7 +289,6 @@
                     } else if (isPercentageCol && cellValue.trim() !== "") {
                         let num = Number(cellValue);
                         if (!isNaN(num)) {
-                            // Converte decimal (ex: 0.3571) para porcentagem (35.71%)
                             let percentVal = num <= 1 ? num * 100 : num;
                             let formattedPercent = percentVal.toFixed(2).replace('.', ',') + '%';
                             let styleAttr = getConditionalColorStyle(percentVal);
