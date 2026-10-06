@@ -23,13 +23,11 @@
             background-color: #f8fafc;
         }
         
-        /* Força o navegador a imprimir cores de fundo e gráficos */
         * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
 
-        /* Estilos exclusivos para o Card A4 otimizado para preencher exatamente a página */
         .page-a4 {
             width: 100%;
             max-width: 210mm;
@@ -80,12 +78,9 @@
     <header class="bg-indigo-600 text-white shadow-md flex-shrink-0 no-print">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
             <div class="flex items-center gap-3">
-                <div class="bg-indigo-700 p-2 rounded-xl shadow-inner">
-                    
-                </div>
+                <div class="bg-indigo-700 p-2 rounded-xl shadow-inner"></div>
                 <div>
                     <h1 class="text-lg font-bold tracking-tight">Dados Tutores , Atividades e Card A4</h1>
-                    
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -150,11 +145,15 @@
                         <img src="banner.jpg" alt="Banner do Curso" class="w-full h-auto block object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/800x150/0f172a/ffffff?text=Banner+Educacao+em+Direitos+Humanos';">
                     </div>
 
-                    <div class="border-b-2 border-slate-800 pb-1 mb-2 text-center">
-                        <h2 class="text-sm font-black text-slate-900 uppercase tracking-tight">Quadro Consolidado de Resultados</h2>
+                    <!-- CABEÇALHO DO CARD A4 COM O RESUMO SOLICITADO AO LADO -->
+                    <div class="border-b-2 border-slate-800 pb-1 mb-2 flex justify-between items-center">
+                        <h2 class="text-xs font-black text-slate-900 uppercase tracking-tight">Quadro Consolidado de Resultados (atualizado 06/10/2026 às 20:00)</h2>
+                        <div id="a4HeaderSummary" class="text-[9px] font-bold text-slate-800">
+                            Respostas Atividades Tutor: Trilha 1: 0/70 e Trilha 2: 0/70
+                        </div>
                     </div>
 
-                    <!-- Tabelas em Duas Colunas com preenchimento milimétrico ajustado -->
+                    <!-- Tabelas em Duas Colunas -->
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <table class="w-full text-left text-[9.5px] border-collapse">
@@ -190,7 +189,7 @@
                     </div>
                 </div>
 
-                <!-- Legenda Explicativa das Colunas com Cores Correspondentes -->
+                <!-- Legenda Explicativa -->
                 <div class="mt-2 pt-1.5 border-t border-slate-300">
                     <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-[8.5px] text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-200 mb-1">
                         <div class="flex items-center gap-1.5">
@@ -210,7 +209,6 @@
                             <span class="truncate"><strong class="text-amber-900">%C / T2:</strong> Porcentagem de entrega de Cursista por Tutor Trilha 2</span>
                         </div>
                     </div>
-                    
                 </div>
             </div>
         </div>
@@ -223,6 +221,7 @@
         <span id="toastMessage">Dados atualizados com sucesso!</span>
     </div>
 
+    <!-- JAVASCRIPT -->
     <script>
         const scriptUrl = "https://script.google.com/macros/s/AKfycbzbSe8OY2Do4ZA3BOo3lst03S8lHiupSYVKCjoFRgggoTbGUDakcKFnmz2O6fGY1CXuBQ/exec";
         let tableHeaders = [];
@@ -458,7 +457,6 @@
             });
         }
 
-        // Função para deixar apenas o primeiro e o último nome visíveis
         function abreviarPrimeiroEUltimoNome(nomeCompleto) {
             if (!nomeCompleto) return "";
             const partes = nomeCompleto.trim().split(/\s+/);
@@ -466,7 +464,6 @@
             return `${partes[0]} ${partes[partes.length - 1]}`;
         }
 
-        // Converte "Entregue" / "Não Entregue" para "Sim" / "Não"
         function formatarStatusSimNao(valor) {
             if (!valor) return "-";
             const valNorm = String(valor).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
@@ -475,7 +472,6 @@
             return valor;
         }
 
-        // Formatação compacta para as caixas de cor de porcentagem no Card A4
         function formatarPercentualCardA4(valor) {
             if (valor === undefined || valor === null || String(valor).trim() === "") return "-";
             let rawStr = String(valor).trim().replace(',', '.');
@@ -489,6 +485,7 @@
             return `<span style="${styleAttr} padding: 1.5px 4px; border-radius: 2px; display: inline-block; text-align: center; font-size: 8.5px; line-height: 1.1;">${formattedPercent}</span>`;
         }
 
+        // FUNÇÃO DE RENDERIZAÇÃO DO CARD A4 COM CÁLCULO DINÂMICO DOS "SIM"
         function renderA4Content() {
             const col1 = document.getElementById('a4Column1');
             const col2 = document.getElementById('a4Column2');
@@ -500,10 +497,28 @@
             const dataCol2 = tableData.slice(half);
 
             const hName = tableHeaders[0] || "";
-            const hH = tableHeaders[7] || ""; // Coluna H
+            const hH = tableHeaders[7] || ""; // Coluna H (A. T 1)
             const hO = tableHeaders[14] || ""; // Coluna O
-            const hI = tableHeaders[8] || ""; // Coluna I
+            const hI = tableHeaders[8] || ""; // Coluna I (A. T 2)
             const hQ = tableHeaders[16] || ""; // Coluna Q
+
+            // 1. Calcula o total de "Sim" na Trilha 1
+            let totalSimT1 = tableData.reduce((acc, rowObj) => {
+                const status = formatarStatusSimNao(rowObj[hH]);
+                return status === "Sim" ? acc + 1 : acc;
+            }, 0);
+
+            // 2. Calcula o total de "Sim" na Trilha 2
+            let totalSimT2 = tableData.reduce((acc, rowObj) => {
+                const status = formatarStatusSimNao(rowObj[hI]);
+                return status === "Sim" ? acc + 1 : acc;
+            }, 0);
+
+            // 3. Atualiza o elemento no topo do Card A4
+            const summaryEl = document.getElementById('a4HeaderSummary');
+            if (summaryEl) {
+                summaryEl.innerHTML = `Atividade Tutor: Trilha 1: <strong>${totalSimT1}</strong> /70 - Trilha 2: <strong>${totalSimT2}</strong> /70`;
+            }
 
             const createRow = (rowObj, index) => {
                 const tr = document.createElement('tr');
@@ -574,3 +589,4 @@
     </script>
 </body>
 </html>
+
