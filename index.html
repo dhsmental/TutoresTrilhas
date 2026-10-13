@@ -423,7 +423,7 @@
             let formattedPercent = percentVal.toFixed(1).replace('.', ',') + '%';
             let styleAttr = getConditionalColorStyle(percentVal);
 
-            return `<span style="${styleAttr} padding: 1.5px 2px; border-radius: 2px; display: inline-block; text-align: center; font-size: 7.5px; line-height: 1;">${formattedPercent}</span>`;
+            return `<span style="${styleAttr} padding: 1.5px 2px; border-radius: 2px; display: inline-block; text-align: center; font-size: 9px; line-height: 1;">${formattedPercent}</span>`;
         }
 
         function getColHeader(possibleNames, fallbackIndex) {
@@ -518,15 +518,15 @@
 
                     let rowContent = `
                         <td class="px-1 py-0.5 text-center font-mono text-[7.5px] text-slate-400 border-r border-slate-100">${globalIndex}</td>
-                        <td class="px-1.5 py-0.5 font-medium text-slate-800 text-[8px] truncate max-w-[80px]" title="${rawName}">${nameVal}</td>
+                        <td class="px-1.5 py-0.5 font-medium text-slate-800 text-[10px] truncate max-w-[100px]" title="${rawName}">${nameVal}</td>
                     `;
 
-                    if(showT1) rowContent += `<td class="px-0.5 py-0.5 text-[8px] text-center font-bold text-blue-900 bg-blue-50/50 border-l border-slate-100">${at1}</td><td class="px-0.5 py-0.5 text-center bg-blue-50/20 border-l border-slate-100">${pcT1}</td>`;
-                    if(showT2) rowContent += `<td class="px-0.5 py-0.5 text-[8px] text-center font-bold text-emerald-900 bg-emerald-50/50 border-l border-slate-100">${at2}</td><td class="px-0.5 py-0.5 text-center bg-emerald-50/20 border-l border-slate-100">${pcT2}</td>`;
-                    if(showT3) rowContent += `<td class="px-0.5 py-0.5 text-[8px] text-center font-bold text-purple-900 bg-purple-50/50 border-l border-slate-100">${at3}</td><td class="px-0.5 py-0.5 text-center bg-purple-50/20 border-l border-slate-100">${pcT3}</td>`;
-                    if(showT4) rowContent += `<td class="px-0.5 py-0.5 text-[8px] text-center font-bold text-amber-900 bg-amber-50/50 border-l border-slate-100">${at4}</td><td class="px-0.5 py-0.5 text-center bg-amber-50/20 border-l border-slate-100">${pcT4}</td>`;
-                    if(showT5) rowContent += `<td class="px-0.5 py-0.5 text-[8px] text-center font-bold text-rose-900 bg-rose-50/50 border-l border-slate-100">${at5}</td><td class="px-0.5 py-0.5 text-center bg-rose-50/20 border-l border-slate-100">${pcT5}</td>`;
-                    if(showT6) rowContent += `<td class="px-0.5 py-0.5 text-[8px] text-center font-bold text-cyan-900 bg-cyan-50/50 border-l border-slate-100">${at6}</td><td class="px-0.5 py-0.5 text-center bg-cyan-50/20 border-l border-slate-100">${pcT6}</td>`;
+                    if(showT1) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-blue-900 bg-blue-50/50 border-l border-slate-100">${at1}</td><td class="px-0.5 py-0.5 text-center bg-blue-50/20 border-l border-slate-100">${pcT1}</td>`;
+                    if(showT2) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-emerald-900 bg-emerald-50/50 border-l border-slate-100">${at2}</td><td class="px-0.5 py-0.5 text-center bg-emerald-50/20 border-l border-slate-100">${pcT2}</td>`;
+                    if(showT3) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-purple-900 bg-purple-50/50 border-l border-slate-100">${at3}</td><td class="px-0.5 py-0.5 text-center bg-purple-50/20 border-l border-slate-100">${pcT3}</td>`;
+                    if(showT4) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-amber-900 bg-amber-50/50 border-l border-slate-100">${at4}</td><td class="px-0.5 py-0.5 text-center bg-amber-50/20 border-l border-slate-100">${pcT4}</td>`;
+                    if(showT5) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-rose-900 bg-rose-50/50 border-l border-slate-100">${at5}</td><td class="px-0.5 py-0.5 text-center bg-rose-50/20 border-l border-slate-100">${pcT5}</td>`;
+                    if(showT6) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-cyan-900 bg-cyan-50/50 border-l border-slate-100">${at6}</td><td class="px-0.5 py-0.5 text-center bg-cyan-50/20 border-l border-slate-100">${pcT6}</td>`;
 
                     html += `<tr class="${bgClass}">${rowContent}</tr>`;
                 });
@@ -592,7 +592,7 @@
                             <div class="flex-grow flex flex-col w-full">
                                 <table class="w-full h-full text-left text-[8px] border-collapse">
                                     <thead>
-                                        <tr class="bg-slate-800 text-white font-bold uppercase text-[7.5px] leading-tight h-[1%]">
+                                        <tr class="bg-slate-800 text-white font-bold uppercase text-[9px] leading-tight h-[1%]">
                                             ${theadContent}
                                         </tr>
                                     </thead>
