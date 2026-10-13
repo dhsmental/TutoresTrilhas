@@ -36,7 +36,7 @@
             margin: 0 auto;
             background: #ffffff;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            padding: 3mm 5mm;
+            padding: 5mm 5mm;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -52,20 +52,34 @@
             body * {
                 visibility: hidden !important;
             }
-            .page-a4, .page-a4 * {
+            #viewA4, #viewA4 * {
                 visibility: visible !important;
             }
+            #viewA4 {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                display: block !important;
+                overflow: visible !important;
+            }
             .page-a4 {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
+                position: relative !important;
+                page-break-after: always;
                 width: 210mm !important;
                 height: 297mm !important;
                 max-height: 297mm !important;
                 box-shadow: none !important;
-                margin: 0 !important;
-                padding: 3mm 5mm !important;
+                margin: 0 auto !important;
+                padding: 5mm 5mm !important;
+                border: none !important;
                 overflow: hidden !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+            }
+            .page-a4:last-child {
+                page-break-after: auto;
             }
             .no-print {
                 display: none !important;
@@ -80,7 +94,7 @@
             <div class="flex items-center gap-3">
                 <div class="bg-indigo-700 p-2 rounded-xl shadow-inner"></div>
                 <div>
-                    <h1 class="text-lg font-bold tracking-tight">Dados Tutores , Atividades e Card A4</h1>
+                    <h1 class="text-lg font-bold tracking-tight">Dados Tutores, Atividades e Card A4</h1>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -97,7 +111,7 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-4 flex flex-col overflow-hidden">
         
-        <!-- ABA 1: TABELA PRINCIPAL DINÂMICA (A até Q) -->
+        <!-- ABA 1: TABELA PRINCIPAL DINÂMICA -->
         <div id="viewDashboard" class="flex flex-col flex-grow overflow-hidden">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col flex-grow overflow-hidden">
                 <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4 flex-shrink-0">
@@ -118,11 +132,9 @@
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
                             <tr id="tableHeaderRow" class="bg-slate-50 text-slate-500 border-b border-slate-200 uppercase font-semibold shadow-sm">
-                                <!-- Preenchido dinamicamente -->
                             </tr>
                         </thead>
                         <tbody id="dataTableBody" class="divide-y divide-slate-100 text-slate-700">
-                            <!-- Preenchido via JavaScript -->
                         </tbody>
                     </table>
                 </div>
@@ -130,87 +142,16 @@
         </div>
 
         <!-- ABA 2: CARD A4 -->
-        <div id="viewA4" class="hidden flex-col flex-grow overflow-y-auto items-center">
-            <div class="mb-3 flex justify-between w-full max-w-[210mm] no-print items-center">
+        <div id="viewA4" class="hidden flex-col flex-grow overflow-y-auto items-center pb-8">
+            <div class="mb-4 mt-2 flex justify-between w-full max-w-[210mm] no-print items-center">
                 <span class="text-xs text-slate-500 font-medium">Pré-visualização do Relatório A4</span>
                 <button onclick="window.print()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow flex items-center gap-2 cursor-pointer">
-                    <i class="fa-solid fa-print"></i> Imprimir / Salvar PDF (A4)
+                    <i class="fa-solid fa-print"></i> Imprimir / Salvar PDF
                 </button>
             </div>
 
-            <div class="page-a4 border border-slate-300 rounded-lg">
-                <div>
-                    <!-- Imagem de Banner -->
-                    <div class="w-full mb-2 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
-                        <img src="banner.jpg" alt="Banner do Curso" class="w-full h-auto block object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/800x150/0f172a/ffffff?text=Banner+Educacao+em+Direitos+Humanos';">
-                    </div>
-
-                    <!-- CABEÇALHO DO CARD A4 COM O RESUMO SOLICITADO AO LADO -->
-                    <div class="border-b-2 border-slate-800 pb-1 mb-2 flex justify-between items-center">
-                        <h2 class="text-xs font-black text-slate-900 tracking-tight">Resultados Consolidados (atualizado 07/10/2026 Tutores e 06/10/2026 Cursistas)</h2>
-                        <div id="a4HeaderSummary" class="text-[9px] font-bold text-slate-800">
-                            Respostas Atividades Tutor: Trilha 1: 0/70 e Trilha 2: 0/70
-                        </div>
-                    </div>
-
-                    <!-- Tabelas em Duas Colunas -->
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <table class="w-full text-left text-[9.5px] border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-800 text-white font-bold uppercase text-[8px]">
-                                        <th class="py-1 px-1 w-5 text-center">#</th>
-                                        <th class="py-1 px-1.5">Tutor</th>
-                                        <th class="py-1 px-0.5 text-center bg-blue-900 text-white">A. T 1</th>
-                                        <th class="py-1 px-0.5 text-center bg-emerald-900 text-white">%C / T1</th>
-                                        <th class="py-1 px-0.5 text-center bg-purple-900 text-white">A. T 2</th>
-                                        <th class="py-1 px-0.5 text-center bg-amber-900 text-white">%C / T2</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="a4Column1" class="divide-y divide-slate-200 border-b border-slate-200"></tbody>
-                            </table>
-                        </div>
-
-                        <div>
-                            <table class="w-full text-left text-[9.5px] border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-800 text-white font-bold uppercase text-[8px]">
-                                        <th class="py-1 px-1 w-5 text-center">#</th>
-                                        <th class="py-1 px-1.5">Tutor</th>
-                                        <th class="py-1 px-0.5 text-center bg-blue-900 text-white">A. T 1</th>
-                                        <th class="py-1 px-0.5 text-center bg-emerald-900 text-white">%C / T1</th>
-                                        <th class="py-1 px-0.5 text-center bg-purple-900 text-white">A. T 2</th>
-                                        <th class="py-1 px-0.5 text-center bg-amber-900 text-white">%C / T2</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="a4Column2" class="divide-y divide-slate-200 border-b border-slate-200"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Legenda Explicativa -->
-                <div class="mt-2 pt-1.5 border-t border-slate-300">
-                    <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-[8.5px] text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-200 mb-1">
-                        <div class="flex items-center gap-1.5">
-                            <span class="inline-block w-3 h-3 bg-blue-100 border border-blue-300 rounded-sm flex-shrink-0"></span>
-                            <span class="truncate"><strong class="text-blue-900">A. T 1:</strong> Atividades Tutor Trilha 1</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="inline-block w-3 h-3 bg-purple-100 border border-purple-300 rounded-sm flex-shrink-0"></span>
-                            <span class="truncate"><strong class="text-purple-900">A. T 2:</strong> Atividades Tutor Trilha 2</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="inline-block w-3 h-3 bg-emerald-100 border border-emerald-300 rounded-sm flex-shrink-0"></span>
-                            <span class="truncate"><strong class="text-emerald-900">%C / T1:</strong> Porcentagem de entrega de Cursista por Tutor Trilha 1</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="inline-block w-3 h-3 bg-amber-100 border border-amber-300 rounded-sm flex-shrink-0"></span>
-                            <span class="truncate"><strong class="text-amber-900">%C / T2:</strong> Porcentagem de entrega de Cursista por Tutor Trilha 2</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Contêiner dinâmico para as páginas A4 -->
+            <div id="a4PagesContainer" class="w-full flex flex-col items-center gap-8"></div>
         </div>
 
     </main>
@@ -276,9 +217,7 @@
                 
                 const result = await response.json();
                 
-                if (result.error) {
-                    throw new Error(result.error);
-                }
+                if (result.error) throw new Error(result.error);
 
                 if (result.headers && result.data) {
                     tableHeaders = result.headers;
@@ -301,26 +240,17 @@
 
         function formatPhoneNumber(value) {
             const numbers = String(value).replace(/\D/g, '');
-            if (numbers.length === 11) {
-                return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
-            } else if (numbers.length === 10) {
-                return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6, 10)}`;
-            } else if (numbers.length === 13 && numbers.startsWith('55')) {
-                return `+${numbers.slice(0, 2)} (${numbers.slice(2, 4)}) ${numbers.slice(4, 9)}-${numbers.slice(9, 13)}`;
-            }
+            if (numbers.length === 11) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+            else if (numbers.length === 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6, 10)}`;
+            else if (numbers.length === 13 && numbers.startsWith('55')) return `+${numbers.slice(0, 2)} (${numbers.slice(2, 4)}) ${numbers.slice(4, 9)}-${numbers.slice(9, 13)}`;
             return value;
         }
 
         function getConditionalColorStyle(percentVal) {
-            if (percentVal <= 33) {
-                return "background-color: #fee2e2; color: #991b1b; font-weight: 600;";
-            } else if (percentVal <= 50) {
-                return "background-color: #ffedd5; color: #9a3412; font-weight: 600;";
-            } else if (percentVal <= 75) {
-                return "background-color: #fef08a; color: #854d0e; font-weight: 600;";
-            } else {
-                return "background-color: #dcfce7; color: #166534; font-weight: 600;";
-            }
+            if (percentVal <= 33) return "background-color: #fee2e2; color: #991b1b; font-weight: 600;";
+            else if (percentVal <= 50) return "background-color: #ffedd5; color: #9a3412; font-weight: 600;";
+            else if (percentVal <= 75) return "background-color: #fef08a; color: #854d0e; font-weight: 600;";
+            else return "background-color: #dcfce7; color: #166534; font-weight: 600;";
         }
 
         function isNumericColumn(headerName) {
@@ -436,21 +366,17 @@
                             let formattedPercent = percentVal.toFixed(2).replace('.', ',') + '%';
                             let styleAttr = getConditionalColorStyle(percentVal);
                             td.innerHTML = `<span style="${styleAttr} padding: 4px 8px; border-radius: 4px; display: inline-block; text-align: center; min-width: 75px;">${formattedPercent}</span>`;
-                        } else {
-                            td.innerText = cellValue;
-                        }
+                        } else td.innerText = cellValue;
                     } else if (isTrilhaCol) {
                         const valLower = cellValue.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
                         let badgeClass = "";
                         if (valLower === "entregue") badgeClass = "bg-emerald-600 text-white px-2.5 py-1 rounded-md font-medium text-[11px] inline-block";
                         else if (valLower === "nao entregue") badgeClass = "bg-amber-400 text-slate-900 px-2.5 py-1 rounded-md font-medium text-[11px] inline-block";
-                        else if (valLower === "nao disponivel" || valLower === "nao se aplica") badgeClass = "bg-slate-500 text-white px-2.5 py-1 rounded-md font-medium text-[11px] inline-block";
+                        else if (valLower === "nao disponivel" || valLower === "nao se aplica" || valLower === "-") badgeClass = "bg-slate-500 text-white px-2.5 py-1 rounded-md font-medium text-[11px] inline-block";
 
-                        if (badgeClass) td.innerHTML = `<span class="${badgeClass}">${cellValue}</span>`;
+                        if (badgeClass) td.innerHTML = `<span class="${badgeClass}">${valLower === "nao disponivel" || valLower === "nao se aplica" ? "-" : cellValue}</span>`;
                         else td.innerText = cellValue;
-                    } else {
-                        td.innerText = cellValue;
-                    }
+                    } else td.innerText = cellValue;
                     tr.appendChild(td);
                 });
                 tbody.appendChild(tr);
@@ -465,86 +391,227 @@
         }
 
         function formatarStatusSimNao(valor) {
-            if (!valor) return "-";
+            if (valor === undefined || valor === null || String(valor).trim() === "") return `<span class="text-slate-400 font-bold">-</span>`;
+            
             const valNorm = String(valor).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+            
+            if (valNorm === "nao disponivel" || valNorm === "nao se aplica" || valNorm === "-") {
+                return `<span class="text-slate-400 font-bold">-</span>`;
+            }
             if (valNorm.includes("entregue") && !valNorm.includes("nao")) return "Sim";
             if (valNorm.includes("nao entregue")) return "Não";
-            return valor;
+            
+            if (valNorm === "sim") return "Sim";
+            if (valNorm === "nao") return "Não";
+            
+            return `<span class="text-slate-400 font-bold">-</span>`;
         }
 
         function formatarPercentualCardA4(valor) {
-            if (valor === undefined || valor === null || String(valor).trim() === "") return "-";
+            if (valor === undefined || valor === null || String(valor).trim() === "") return `<span class="text-slate-400 font-bold">-</span>`;
+            
+            const valNorm = String(valor).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+            if (valNorm === "nao disponivel" || valNorm === "nao se aplica" || valNorm === "-") {
+                return `<span class="text-slate-400 font-bold">-</span>`;
+            }
+
             let rawStr = String(valor).trim().replace(',', '.');
             let num = Number(rawStr);
-            if (isNaN(num)) return valor;
+            if (isNaN(num)) return `<span class="text-slate-400 font-bold">-</span>`;
 
             let percentVal = num <= 1 ? num * 100 : num;
-            let formattedPercent = percentVal.toFixed(2).replace('.', ',') + '%';
+            let formattedPercent = percentVal.toFixed(1).replace('.', ',') + '%';
             let styleAttr = getConditionalColorStyle(percentVal);
 
-            return `<span style="${styleAttr} padding: 1.5px 4px; border-radius: 2px; display: inline-block; text-align: center; font-size: 8.5px; line-height: 1.1;">${formattedPercent}</span>`;
+            return `<span style="${styleAttr} padding: 1.5px 2px; border-radius: 2px; display: inline-block; text-align: center; font-size: 7.5px; line-height: 1;">${formattedPercent}</span>`;
         }
 
-        // FUNÇÃO DE RENDERIZAÇÃO DO CARD A4 COM CÁLCULO DINÂMICO DOS "SIM"
+        function getColHeader(possibleNames, fallbackIndex) {
+            for (let name of possibleNames) {
+                let idx = tableHeaders.findIndex(h => h && h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(name));
+                if (idx !== -1) return tableHeaders[idx];
+            }
+            return tableHeaders[fallbackIndex] || "";
+        }
+
+        // Função para checar se a trilha possui algum dado útil para ser exibida
+        function isTrackActive(headerA, headerC) {
+            if (!headerA && !headerC) return false;
+            return tableData.some(row => {
+                let valA = String(row[headerA] || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                let valC = String(row[headerC] || "").trim();
+                
+                let aValid = valA !== "" && valA !== "-" && valA !== "nao disponivel" && valA !== "nao se aplica";
+                let cValid = valC !== "" && valC !== "-";
+                
+                return aValid || cValid;
+            });
+        }
+
         function renderA4Content() {
-            const col1 = document.getElementById('a4Column1');
-            const col2 = document.getElementById('a4Column2');
-            col1.innerHTML = '';
-            col2.innerHTML = '';
+            const container = document.getElementById('a4PagesContainer');
+            container.innerHTML = '';
 
             const half = Math.ceil(tableData.length / 2);
             const dataCol1 = tableData.slice(0, half);
             const dataCol2 = tableData.slice(half);
 
             const hName = tableHeaders[0] || "";
-            const hH = tableHeaders[7] || ""; // Coluna H (A. T 1)
-            const hO = tableHeaders[14] || ""; // Coluna O
-            const hI = tableHeaders[8] || ""; // Coluna I (A. T 2)
-            const hQ = tableHeaders[16] || ""; // Coluna Q
+            
+            const hT1_A = getColHeader(["a. t 1", "atividade tutor 1", "trilha 1"], 7);
+            const hT2_A = getColHeader(["a. t 2", "atividade tutor 2", "trilha 2"], 8);
+            const hT3_A = getColHeader(["a. t 3", "atividade tutor 3", "trilha 3"], 9);
+            const hT4_A = getColHeader(["a. t 4", "atividade tutor 4", "trilha 4"], 10);
+            const hT5_A = getColHeader(["a. t 5", "atividade tutor 5", "trilha 5"], 11);
+            const hT6_A = getColHeader(["a. t 6", "atividade tutor 6", "trilha 6"], 12);
 
-            // 1. Calcula o total de "Sim" na Trilha 1
-            let totalSimT1 = tableData.reduce((acc, rowObj) => {
-                const status = formatarStatusSimNao(rowObj[hH]);
-                return status === "Sim" ? acc + 1 : acc;
+            const hT1_C = getColHeader(["%c / t1", "%c t1", "% cursista 1", "media 1"], 14);
+            const hT2_C = getColHeader(["%c / t2", "%c t2", "% cursista 2", "media 2"], 16);
+            const hT3_C = getColHeader(["%c / t3", "%c t3", "% cursista 3", "media 3"], 18);
+            const hT4_C = getColHeader(["%c / t4", "%c t4", "% cursista 4", "media 4"], 20);
+            const hT5_C = getColHeader(["%c / t5", "%c t5", "% cursista 5", "media 5"], 22);
+            const hT6_C = getColHeader(["%c / t6", "%c t6", "% cursista 6", "media 6"], 24);
+
+            // Variáveis de controle para exibir ou ocultar trilhas com base no conteúdo
+            const showT1 = isTrackActive(hT1_A, hT1_C);
+            const showT2 = isTrackActive(hT2_A, hT2_C);
+            const showT3 = isTrackActive(hT3_A, hT3_C);
+            const showT4 = isTrackActive(hT4_A, hT4_C);
+            const showT5 = isTrackActive(hT5_A, hT5_C);
+            const showT6 = isTrackActive(hT6_A, hT6_C);
+
+            const countSim = (header) => tableData.reduce((acc, rowObj) => {
+                const raw = String(rowObj[header] || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                if (raw.includes("entregue") && !raw.includes("nao")) return acc + 1;
+                if (raw === "sim") return acc + 1;
+                return acc;
             }, 0);
 
-            // 2. Calcula o total de "Sim" na Trilha 2
-            let totalSimT2 = tableData.reduce((acc, rowObj) => {
-                const status = formatarStatusSimNao(rowObj[hI]);
-                return status === "Sim" ? acc + 1 : acc;
-            }, 0);
+            const totalSimT1 = showT1 ? countSim(hT1_A) : 0;
+            const totalSimT2 = showT2 ? countSim(hT2_A) : 0;
+            const totalSimT3 = showT3 ? countSim(hT3_A) : 0;
+            const totalSimT4 = showT4 ? countSim(hT4_A) : 0;
+            const totalSimT5 = showT5 ? countSim(hT5_A) : 0;
+            const totalSimT6 = showT6 ? countSim(hT6_A) : 0;
 
-            // 3. Atualiza o elemento no topo do Card A4
-            const summaryEl = document.getElementById('a4HeaderSummary');
-            if (summaryEl) {
-                summaryEl.innerHTML = `Atividade Tutor: Trilha 1: <strong>${totalSimT1}</strong> /70 - Trilha 2: <strong>${totalSimT2}</strong> /70`;
+            function generateRowsHtml(dataSubset, startIndex) {
+                let html = '';
+                dataSubset.forEach((rowObj, index) => {
+                    const globalIndex = startIndex + index + 1;
+                    const rawName = String(rowObj[hName] || "Registro");
+                    const nameVal = abreviarPrimeiroEUltimoNome(rawName);
+                    
+                    const at1 = formatarStatusSimNao(rowObj[hT1_A]);
+                    const pcT1 = formatarPercentualCardA4(rowObj[hT1_C]);
+                    const at2 = formatarStatusSimNao(rowObj[hT2_A]);
+                    const pcT2 = formatarPercentualCardA4(rowObj[hT2_C]);
+                    const at3 = formatarStatusSimNao(rowObj[hT3_A]);
+                    const pcT3 = formatarPercentualCardA4(rowObj[hT3_C]);
+                    const at4 = formatarStatusSimNao(rowObj[hT4_A]);
+                    const pcT4 = formatarPercentualCardA4(rowObj[hT4_C]);
+                    const at5 = formatarStatusSimNao(rowObj[hT5_A]);
+                    const pcT5 = formatarPercentualCardA4(rowObj[hT5_C]);
+                    const at6 = formatarStatusSimNao(rowObj[hT6_A]);
+                    const pcT6 = formatarPercentualCardA4(rowObj[hT6_C]);
+
+                    const bgClass = index % 2 === 0 ? "bg-white" : "bg-slate-50/60";
+
+                    let rowContent = `
+                        <td class="px-1 py-0.5 text-center font-mono text-[7.5px] text-slate-400 border-r border-slate-100">${globalIndex}</td>
+                        <td class="px-1.5 py-0.5 font-medium text-slate-800 text-[8px] truncate max-w-[80px]" title="${rawName}">${nameVal}</td>
+                    `;
+
+                    if(showT1) rowContent += `<td class="px-0.5 py-0.5 text-[8px] text-center font-bold text-blue-900 bg-blue-50/50 border-l border-slate-100">${at1}</td><td class="px-0.5 py-0.5 text-center bg-blue-50/20 border-l border-slate-100">${pcT1}</td>`;
+                    if(showT2) rowContent += `<td class="px-0.5 py-0.5 text-[8px] text-center font-bold text-emerald-900 bg-emerald-50/50 border-l border-slate-100">${at2}</td><td class="px-0.5 py-0.5 text-center bg-emerald-50/20 border-l border-slate-100">${pcT2}</td>`;
+                    if(showT3) rowContent += `<td class="px-0.5 py-0.5 text-[8px] text-center font-bold text-purple-900 bg-purple-50/50 border-l border-slate-100">${at3}</td><td class="px-0.5 py-0.5 text-center bg-purple-50/20 border-l border-slate-100">${pcT3}</td>`;
+                    if(showT4) rowContent += `<td class="px-0.5 py-0.5 text-[8px] text-center font-bold text-amber-900 bg-amber-50/50 border-l border-slate-100">${at4}</td><td class="px-0.5 py-0.5 text-center bg-amber-50/20 border-l border-slate-100">${pcT4}</td>`;
+                    if(showT5) rowContent += `<td class="px-0.5 py-0.5 text-[8px] text-center font-bold text-rose-900 bg-rose-50/50 border-l border-slate-100">${at5}</td><td class="px-0.5 py-0.5 text-center bg-rose-50/20 border-l border-slate-100">${pcT5}</td>`;
+                    if(showT6) rowContent += `<td class="px-0.5 py-0.5 text-[8px] text-center font-bold text-cyan-900 bg-cyan-50/50 border-l border-slate-100">${at6}</td><td class="px-0.5 py-0.5 text-center bg-cyan-50/20 border-l border-slate-100">${pcT6}</td>`;
+
+                    html += `<tr class="${bgClass}">${rowContent}</tr>`;
+                });
+                return html;
             }
 
-            const createRow = (rowObj, index) => {
-                const tr = document.createElement('tr');
-                tr.className = index % 2 === 0 ? "bg-white" : "bg-slate-50/60";
-                
-                const rawName = String(rowObj[hName] || "Registro");
-                const nameVal = abreviarPrimeiroEUltimoNome(rawName);
-                
-                const at1 = formatarStatusSimNao(rowObj[hH]);
-                const pcT1 = formatarPercentualCardA4(rowObj[hO]);
-                const at2 = formatarStatusSimNao(rowObj[hI]);
-                const pcT2 = formatarPercentualCardA4(rowObj[hQ]);
+            // Geração Dinâmica da Legenda
+            let legendItems = [];
+            if(showT1) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-blue-100 border border-blue-400 rounded-sm"></span><span class="truncate"><strong>T1:</strong> Ativ. Tutor e % Cursista Trilha 1</span></div>`);
+            if(showT2) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-emerald-100 border border-emerald-400 rounded-sm"></span><span class="truncate"><strong>T2:</strong> Ativ. Tutor e % Cursista Trilha 2</span></div>`);
+            if(showT3) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-purple-100 border border-purple-400 rounded-sm"></span><span class="truncate"><strong>T3:</strong> Ativ. Tutor e % Cursista Trilha 3</span></div>`);
+            if(showT4) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-amber-100 border border-amber-400 rounded-sm"></span><span class="truncate"><strong>T4:</strong> Ativ. Tutor e % Cursista Trilha 4</span></div>`);
+            if(showT5) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-rose-100 border border-rose-400 rounded-sm"></span><span class="truncate"><strong>T5:</strong> Ativ. Tutor e % Cursista Trilha 5</span></div>`);
+            if(showT6) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-cyan-100 border border-cyan-400 rounded-sm"></span><span class="truncate"><strong>T6:</strong> Ativ. Tutor e % Cursista Trilha 6</span></div>`);
+            
+            let legendHtml = legendItems.length > 0 ? `<div class="grid grid-cols-3 gap-x-2 gap-y-1 text-[7.5px] text-slate-700 bg-slate-50 p-1.5 rounded-lg border border-slate-200">${legendItems.join('')}</div>` : '';
 
-                tr.innerHTML = `
-                    <td class="py-[3.8px] px-1 text-center font-mono text-[8.5px] text-slate-400 border-r border-slate-100">${index + 1}</td>
-                    <td class="py-[3.8px] px-1.5 font-medium text-slate-800 truncate max-w-[100px]" title="${rawName}">${nameVal}</td>
-                    <td class="py-[3.8px] px-0.5 text-center font-bold text-blue-900 bg-blue-50/50 border-l border-slate-100">${at1}</td>
-                    <td class="py-[3.8px] px-0.5 text-center bg-emerald-50/40 border-l border-slate-100">${pcT1}</td>
-                    <td class="py-[3.8px] px-0.5 text-center font-bold text-purple-900 bg-purple-50/50 border-l border-slate-100">${at2}</td>
-                    <td class="py-[3.8px] px-0.5 text-center bg-amber-50/40 border-l border-slate-100">${pcT2}</td>
+
+            // Geração Dinâmica dos Contadores "Sim"
+            let totalTutores = tableData.length; // Pega o total de tutores automaticamente
+            let summaries = [];
+            if(showT1) summaries.push(`<span class="text-blue-700 ml-1">T1: ${totalSimT1}/${totalTutores}</span>`);
+            if(showT2) summaries.push(`<span class="text-emerald-700">T2: ${totalSimT2}/${totalTutores}</span>`);
+            if(showT3) summaries.push(`<span class="text-purple-700">T3: ${totalSimT3}/${totalTutores}</span>`);
+            if(showT4) summaries.push(`<span class="text-amber-700">T4: ${totalSimT4}/${totalTutores}</span>`);
+            if(showT5) summaries.push(`<span class="text-rose-700">T5: ${totalSimT5}/${totalTutores}</span>`);
+            if(showT6) summaries.push(`<span class="text-cyan-700">T6: ${totalSimT6}/${totalTutores}</span>`);
+            let summaryText = summaries.length > 0 ? summaries.join(' | ') : '<span class="text-slate-400 font-normal ml-1">Sem dados de Atividade</span>';
+
+            // Geração Dinâmica do Cabeçalho da Tabela
+            let theadContent = `
+                <th class="py-1 px-1 w-6 text-center">#</th>
+                <th class="py-1 px-1.5 w-24">Tutor</th>
+            `;
+            if(showT1) theadContent += `<th class="py-1 px-0.5 text-center bg-blue-900 text-white w-7">A. T1</th><th class="py-1 px-0.5 text-center bg-blue-800 text-white w-9">%C T1</th>`;
+            if(showT2) theadContent += `<th class="py-1 px-0.5 text-center bg-emerald-900 text-white w-7">A. T2</th><th class="py-1 px-0.5 text-center bg-emerald-800 text-white w-9">%C T2</th>`;
+            if(showT3) theadContent += `<th class="py-1 px-0.5 text-center bg-purple-900 text-white w-7">A. T3</th><th class="py-1 px-0.5 text-center bg-purple-800 text-white w-9">%C T3</th>`;
+            if(showT4) theadContent += `<th class="py-1 px-0.5 text-center bg-amber-900 text-white w-7">A. T4</th><th class="py-1 px-0.5 text-center bg-amber-800 text-white w-9">%C T4</th>`;
+            if(showT5) theadContent += `<th class="py-1 px-0.5 text-center bg-rose-900 text-white w-7">A. T5</th><th class="py-1 px-0.5 text-center bg-rose-800 text-white w-9">%C T5</th>`;
+            if(showT6) theadContent += `<th class="py-1 px-0.5 text-center bg-cyan-900 text-white w-7">A. T6</th><th class="py-1 px-0.5 text-center bg-cyan-800 text-white w-9">%C T6</th>`;
+
+
+            function buildPageHtml(rowsHtml) {
+                return `
+                    <div class="page-a4 border border-slate-300 rounded-lg flex flex-col shrink-0">
+                        
+                        <div class="w-full flex flex-col flex-grow">
+                            <div class="w-full mb-2 rounded-lg overflow-hidden border border-slate-200 shadow-sm shrink-0">
+                                <img src="banner.jpg" alt="Banner do Curso" class="w-full h-auto block object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/800x150/0f172a/ffffff?text=Banner+Educacao+em+Direitos+Humanos';">
+                            </div>
+
+                            <div class="border-b-2 border-slate-800 pb-1 mb-2 flex justify-between items-baseline gap-2 shrink-0">
+                                <h2 class="text-[14px] font-black text-slate-900 tracking-tight leading-tight whitespace-nowrap">
+                                    Resultados Consolidados 
+                                    <span class="text-[10px] font-normal text-slate-600 ml-1">(atualizado 07/10/2026 Tutores e 06/10/2026 Cursistas)</span>
+                                </h2>
+                                <div class="text-[10px] font-bold text-slate-800 text-right whitespace-nowrap">
+                                    Atividades Entregues Tutores :
+                                    ${summaryText}
+                                </div>
+                            </div>
+
+                            <div class="flex-grow flex flex-col w-full">
+                                <table class="w-full h-full text-left text-[8px] border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-800 text-white font-bold uppercase text-[7.5px] leading-tight h-[1%]">
+                                            ${theadContent}
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200 border-b border-slate-200">
+                                        ${rowsHtml}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="w-full shrink-0 mt-2 pt-2 border-t border-slate-300">
+                            ${legendHtml}
+                        </div>
+                    </div>
                 `;
-                return tr;
-            };
+            }
 
-            dataCol1.forEach((item, idx) => col1.appendChild(createRow(item, idx)));
-            dataCol2.forEach((item, idx) => col2.appendChild(createRow(item, idx + half)));
+            if (dataCol1.length > 0) container.innerHTML += buildPageHtml(generateRowsHtml(dataCol1, 0));
+            if (dataCol2.length > 0) container.innerHTML += buildPageHtml(generateRowsHtml(dataCol2, half));
         }
 
         function filterTable() {
@@ -589,4 +656,3 @@
     </script>
 </body>
 </html>
-
