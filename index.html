@@ -578,14 +578,23 @@
                                 <img src="banner.jpg" alt="Banner do Curso" class="w-full h-auto block object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/800x150/0f172a/ffffff?text=Banner+Educacao+em+Direitos+Humanos';">
                             </div>
 
-                            <div class="border-b-2 border-slate-800 pb-1 mb-2 flex justify-between items-baseline gap-2 shrink-0">
-                                <h2 class="text-[14px] font-black text-slate-900 tracking-tight leading-tight whitespace-nowrap">
-                                    Resultados Consolidados 
-                                    <span class="text-[10px] font-normal text-slate-600 ml-1">(atualizado 28/10/2026 Tutores e 27/10/2026 Cursistas)</span>
-                                </h2>
-                                <div class="text-[10px] font-bold text-slate-800 text-right whitespace-nowrap">
-                                    Atividades Entregues Tutores :
-                                    ${summaryText}
+                            <div class="border-b-2 border-slate-800 pb-1.5 mb-2 flex justify-between items-end gap-3 shrink-0">
+                                <!-- Lado Esquerdo: Título em cima, Data embaixo -->
+                                <div class="flex flex-col">
+                                    <h2 class="text-[14px] font-black text-slate-900 tracking-tight leading-tight">
+                                        Resultados Consolidados 
+                                    </h2>
+                                    <span class="text-[10px] font-normal text-slate-600 mt-0.5">
+                                        (atualizado 28/10/2026 Tutores e 28/10/2026 Cursistas)
+                                    </span>
+                                </div>
+
+                                <!-- Lado Direito: Título da contagem e os contadores (com permissão para quebrar linha) -->
+                                <div class="text-[10px] font-bold text-slate-800 text-right max-w-[60%] leading-snug">
+                                    <span class="text-slate-600 text-[9px]">Atividades Entregues Tutores :</span><br>
+                                    <div class="mt-0.5">
+                                        ${summaryText}
+                                    </div>
                                 </div>
                             </div>
 
