@@ -390,7 +390,7 @@
             return `${partes[0]} ${partes[partes.length - 1]}`;
         }
 
-        function formatarStatusSimNao(valor) {
+        function formatarStatusSimNao(valor, nomeTutor, trilhaNum) {
             if (valor === undefined || valor === null || String(valor).trim() === "") return `<span class="text-slate-400 font-bold">-</span>`;
             
             const valNorm = String(valor).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
@@ -399,10 +399,21 @@
                 return `<span class="text-slate-400 font-bold">-</span>`;
             }
             if (valNorm.includes("entregue") && !valNorm.includes("nao")) return "Sim";
-            if (valNorm.includes("nao entregue")) return "Não";
-            
+            if (valNorm.includes("nao entregue") || valNorm === "nao") {
+                if (nomeTutor && trilhaNum) {
+                    const tutorUpper = nomeTutor.toUpperCase();
+                    // Regra: Cayo (Trilhas 1, 2 e 3), Catarina (Trilhas 1, 2 e 3) e Joseane (Trilhas 1, 2 e 3)
+                    const isCayo = tutorUpper.includes("CAYO") && [1, 2, 3].includes(trilhaNum);
+                    const isCatarina = tutorUpper.includes("CATARINA") && [1, 2, 3].includes(trilhaNum);
+                    const isJoseane = tutorUpper.includes("JOSEANE") && [1, 2, 3].includes(trilhaNum);
+
+                    if (isCayo || isCatarina || isJoseane) {
+                        return `<span style="background-color: #e2e8f0; color: #020617; border: 1px solid #94a3b8; padding: 1px 3px; border-radius: 3px; font-weight: bold; display: inline-block;">Não</span>`;
+                    }
+                }
+                return "Não";
+            }
             if (valNorm === "sim") return "Sim";
-            if (valNorm === "nao") return "Não";
             
             return `<span class="text-slate-400 font-bold">-</span>`;
         }
@@ -434,7 +445,6 @@
             return tableHeaders[fallbackIndex] || "";
         }
 
-        // Função para checar se a trilha possui algum dado útil para ser exibida
         function isTrackActive(headerA, headerC) {
             if (!headerA && !headerC) return false;
             return tableData.some(row => {
@@ -472,7 +482,6 @@
             const hT5_C = getColHeader(["%c / t5", "%c t5", "% cursista 5", "media 5"], 22);
             const hT6_C = getColHeader(["%c / t6", "%c t6", "% cursista 6", "media 6"], 24);
 
-            // Variáveis de controle para exibir ou ocultar trilhas com base no conteúdo
             const showT1 = isTrackActive(hT1_A, hT1_C);
             const showT2 = isTrackActive(hT2_A, hT2_C);
             const showT3 = isTrackActive(hT3_A, hT3_C);
@@ -501,17 +510,17 @@
                     const rawName = String(rowObj[hName] || "Registro");
                     const nameVal = abreviarPrimeiroEUltimoNome(rawName);
                     
-                    const at1 = formatarStatusSimNao(rowObj[hT1_A]);
+                    const at1 = formatarStatusSimNao(rowObj[hT1_A], rawName, 1);
                     const pcT1 = formatarPercentualCardA4(rowObj[hT1_C]);
-                    const at2 = formatarStatusSimNao(rowObj[hT2_A]);
+                    const at2 = formatarStatusSimNao(rowObj[hT2_A], rawName, 2);
                     const pcT2 = formatarPercentualCardA4(rowObj[hT2_C]);
-                    const at3 = formatarStatusSimNao(rowObj[hT3_A]);
+                    const at3 = formatarStatusSimNao(rowObj[hT3_A], rawName, 3);
                     const pcT3 = formatarPercentualCardA4(rowObj[hT3_C]);
-                    const at4 = formatarStatusSimNao(rowObj[hT4_A]);
+                    const at4 = formatarStatusSimNao(rowObj[hT4_A], rawName, 4);
                     const pcT4 = formatarPercentualCardA4(rowObj[hT4_C]);
-                    const at5 = formatarStatusSimNao(rowObj[hT5_A]);
+                    const at5 = formatarStatusSimNao(rowObj[hT5_A], rawName, 5);
                     const pcT5 = formatarPercentualCardA4(rowObj[hT5_C]);
-                    const at6 = formatarStatusSimNao(rowObj[hT6_A]);
+                    const at6 = formatarStatusSimNao(rowObj[hT6_A], rawName, 6);
                     const pcT6 = formatarPercentualCardA4(rowObj[hT6_C]);
 
                     const bgClass = index % 2 === 0 ? "bg-white" : "bg-slate-50/60";
@@ -521,53 +530,52 @@
                         <td class="px-1.5 py-0.5 font-medium text-slate-800 text-[10px] truncate max-w-[100px]" title="${rawName}">${nameVal}</td>
                     `;
 
-                    if(showT1) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-blue-900 bg-blue-50/50 border-l border-slate-100">${at1}</td><td class="px-0.5 py-0.5 text-center bg-blue-50/20 border-l border-slate-100">${pcT1}</td>`;
-                    if(showT2) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-emerald-900 bg-emerald-50/50 border-l border-slate-100">${at2}</td><td class="px-0.5 py-0.5 text-center bg-emerald-50/20 border-l border-slate-100">${pcT2}</td>`;
-                    if(showT3) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-purple-900 bg-purple-50/50 border-l border-slate-100">${at3}</td><td class="px-0.5 py-0.5 text-center bg-purple-50/20 border-l border-slate-100">${pcT3}</td>`;
-                    if(showT4) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-amber-900 bg-amber-50/50 border-l border-slate-100">${at4}</td><td class="px-0.5 py-0.5 text-center bg-amber-50/20 border-l border-slate-100">${pcT4}</td>`;
-                    if(showT5) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-rose-900 bg-rose-50/50 border-l border-slate-100">${at5}</td><td class="px-0.5 py-0.5 text-center bg-rose-50/20 border-l border-slate-100">${pcT5}</td>`;
-                    if(showT6) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-cyan-900 bg-cyan-50/50 border-l border-slate-100">${at6}</td><td class="px-0.5 py-0.5 text-center bg-cyan-50/20 border-l border-slate-100">${pcT6}</td>`;
+                    if(showT1) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-sky-950 bg-sky-200/90 border-l border-slate-200">${at1}</td><td class="px-0.5 py-0.5 text-center bg-sky-100/70 border-l border-slate-200">${pcT1}</td>`;
+                    if(showT2) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-teal-950 bg-teal-200/90 border-l border-slate-200">${at2}</td><td class="px-0.5 py-0.5 text-center bg-teal-100/70 border-l border-slate-200">${pcT2}</td>`;
+                    if(showT3) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-purple-950 bg-purple-200/90 border-l border-slate-200">${at3}</td><td class="px-0.5 py-0.5 text-center bg-purple-100/70 border-l border-slate-200">${pcT3}</td>`;
+                    if(showT4) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-amber-950 bg-amber-200/90 border-l border-slate-200">${at4}</td><td class="px-0.5 py-0.5 text-center bg-amber-100/70 border-l border-slate-200">${pcT4}</td>`;
+                    if(showT5) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-rose-950 bg-rose-200/90 border-l border-slate-200">${at5}</td><td class="px-0.5 py-0.5 text-center bg-rose-100/70 border-l border-slate-200">${pcT5}</td>`;
+                    if(showT6) rowContent += `<td class="px-0.5 py-0.5 text-[10px] text-center font-bold text-cyan-950 bg-cyan-200/90 border-l border-slate-200">${at6}</td><td class="px-0.5 py-0.5 text-center bg-cyan-100/70 border-l border-slate-200">${pcT6}</td>`;
 
                     html += `<tr class="${bgClass}">${rowContent}</tr>`;
                 });
                 return html;
             }
 
-            // Geração Dinâmica da Legenda
+            // Cores de fundo e bordas da Legenda bem escuras e destacadas
             let legendItems = [];
-            if(showT1) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-blue-100 border border-blue-400 rounded-sm"></span><span class="truncate"><strong>T1:</strong> Ativ. Tutor e % Cursista Trilha 1</span></div>`);
-            if(showT2) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-emerald-100 border border-emerald-400 rounded-sm"></span><span class="truncate"><strong>T2:</strong> Ativ. Tutor e % Cursista Trilha 2</span></div>`);
-            if(showT3) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-purple-100 border border-purple-400 rounded-sm"></span><span class="truncate"><strong>T3:</strong> Ativ. Tutor e % Cursista Trilha 3</span></div>`);
-            if(showT4) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-amber-100 border border-amber-400 rounded-sm"></span><span class="truncate"><strong>T4:</strong> Ativ. Tutor e % Cursista Trilha 4</span></div>`);
-            if(showT5) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-rose-100 border border-rose-400 rounded-sm"></span><span class="truncate"><strong>T5:</strong> Ativ. Tutor e % Cursista Trilha 5</span></div>`);
-            if(showT6) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 bg-cyan-100 border border-cyan-400 rounded-sm"></span><span class="truncate"><strong>T6:</strong> Ativ. Tutor e % Cursista Trilha 6</span></div>`);
+            if(showT1) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-3 h-3 bg-sky-500 border border-sky-800 rounded-sm"></span><span class="truncate"><strong>T1:</strong> Ativ. Tutor e % Cursista Trilha 1</span></div>`);
+            if(showT2) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-3 h-3 bg-teal-500 border border-teal-800 rounded-sm"></span><span class="truncate"><strong>T2:</strong> Ativ. Tutor e % Cursista Trilha 2</span></div>`);
+            if(showT3) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-3 h-3 bg-purple-500 border border-purple-800 rounded-sm"></span><span class="truncate"><strong>T3:</strong> Ativ. Tutor e % Cursista Trilha 3</span></div>`);
+            if(showT4) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-3 h-3 bg-amber-500 border border-amber-800 rounded-sm"></span><span class="truncate"><strong>T4:</strong> Ativ. Tutor e % Cursista Trilha 4</span></div>`);
+            if(showT5) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-3 h-3 bg-rose-500 border border-rose-800 rounded-sm"></span><span class="truncate"><strong>T5:</strong> Ativ. Tutor e % Cursista Trilha 5</span></div>`);
+            if(showT6) legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-3 h-3 bg-cyan-500 border border-cyan-800 rounded-sm"></span><span class="truncate"><strong>T6:</strong> Ativ. Tutor e % Cursista Trilha 6</span></div>`);
             
-            let legendHtml = legendItems.length > 0 ? `<div class="grid grid-cols-3 gap-x-2 gap-y-1 text-[7.5px] text-slate-700 bg-slate-50 p-1.5 rounded-lg border border-slate-200">${legendItems.join('')}</div>` : '';
+            legendItems.push(`<div class="flex items-center gap-1"><span class="inline-block w-3 h-3" style="background-color: #cbd5e1; border: 1px solid #475569; border-radius: 2px;"></span><span class="truncate"><strong>Prazo Extendido para Entregar</strong></span></div>`);
 
+            let legendHtml = legendItems.length > 0 ? `<div class="grid grid-cols-3 gap-x-2 gap-y-1 text-[7.5px] text-slate-900 bg-slate-100 p-1.5 rounded-lg border border-slate-300 font-semibold">${legendItems.join('')}</div>` : '';
 
-            // Geração Dinâmica dos Contadores "Sim"
-            let totalTutores = tableData.length; // Pega o total de tutores automaticamente
+            let totalTutores = tableData.length;
             let summaries = [];
-            if(showT1) summaries.push(`<span class="text-blue-700 ml-1">T1: ${totalSimT1}/${totalTutores}</span>`);
-            if(showT2) summaries.push(`<span class="text-emerald-700">T2: ${totalSimT2}/${totalTutores}</span>`);
-            if(showT3) summaries.push(`<span class="text-purple-700">T3: ${totalSimT3}/${totalTutores}</span>`);
-            if(showT4) summaries.push(`<span class="text-amber-700">T4: ${totalSimT4}/${totalTutores}</span>`);
-            if(showT5) summaries.push(`<span class="text-rose-700">T5: ${totalSimT5}/${totalTutores}</span>`);
-            if(showT6) summaries.push(`<span class="text-cyan-700">T6: ${totalSimT6}/${totalTutores}</span>`);
+            if(showT1) summaries.push(`<span class="text-sky-900 font-bold ml-1">T1: ${totalSimT1}/${totalTutores}</span>`);
+            if(showT2) summaries.push(`<span class="text-teal-900 font-bold">T2: ${totalSimT2}/${totalTutores}</span>`);
+            if(showT3) summaries.push(`<span class="text-purple-900 font-bold">T3: ${totalSimT3}/${totalTutores}</span>`);
+            if(showT4) summaries.push(`<span class="text-amber-900 font-bold">T4: ${totalSimT4}/${totalTutores}</span>`);
+            if(showT5) summaries.push(`<span class="text-rose-900 font-bold">T5: ${totalSimT5}/${totalTutores}</span>`);
+            if(showT6) summaries.push(`<span class="text-cyan-900 font-bold">T6: ${totalSimT6}/${totalTutores}</span>`);
             let summaryText = summaries.length > 0 ? summaries.join(' | ') : '<span class="text-slate-400 font-normal ml-1">Sem dados de Atividade</span>';
 
-            // Geração Dinâmica do Cabeçalho da Tabela
+            // Cabeçalhos principais da tabela com cores escuras e sólidas
             let theadContent = `
                 <th class="py-1 px-1 w-6 text-center">#</th>
                 <th class="py-1 px-1.5 w-24">Tutor</th>
             `;
-            if(showT1) theadContent += `<th class="py-1 px-0.5 text-center bg-blue-900 text-white w-7">A. T1</th><th class="py-1 px-0.5 text-center bg-blue-800 text-white w-9">%C T1</th>`;
-            if(showT2) theadContent += `<th class="py-1 px-0.5 text-center bg-emerald-900 text-white w-7">A. T2</th><th class="py-1 px-0.5 text-center bg-emerald-800 text-white w-9">%C T2</th>`;
-            if(showT3) theadContent += `<th class="py-1 px-0.5 text-center bg-purple-900 text-white w-7">A. T3</th><th class="py-1 px-0.5 text-center bg-purple-800 text-white w-9">%C T3</th>`;
-            if(showT4) theadContent += `<th class="py-1 px-0.5 text-center bg-amber-900 text-white w-7">A. T4</th><th class="py-1 px-0.5 text-center bg-amber-800 text-white w-9">%C T4</th>`;
-            if(showT5) theadContent += `<th class="py-1 px-0.5 text-center bg-rose-900 text-white w-7">A. T5</th><th class="py-1 px-0.5 text-center bg-rose-800 text-white w-9">%C T5</th>`;
-            if(showT6) theadContent += `<th class="py-1 px-0.5 text-center bg-cyan-900 text-white w-7">A. T6</th><th class="py-1 px-0.5 text-center bg-cyan-800 text-white w-9">%C T6</th>`;
-
+            if(showT1) theadContent += `<th class="py-1 px-0.5 text-center bg-sky-900 text-white font-bold w-7">A. T1</th><th class="py-1 px-0.5 text-center bg-sky-800 text-white font-bold w-9">%C T1</th>`;
+            if(showT2) theadContent += `<th class="py-1 px-0.5 text-center bg-teal-900 text-white font-bold w-7">A. T2</th><th class="py-1 px-0.5 text-center bg-teal-800 text-white font-bold w-9">%C T2</th>`;
+            if(showT3) theadContent += `<th class="py-1 px-0.5 text-center bg-purple-900 text-white font-bold w-7">A. T3</th><th class="py-1 px-0.5 text-center bg-purple-800 text-white font-bold w-9">%C T3</th>`;
+            if(showT4) theadContent += `<th class="py-1 px-0.5 text-center bg-amber-900 text-white font-bold w-7">A. T4</th><th class="py-1 px-0.5 text-center bg-amber-800 text-white font-bold w-9">%C T4</th>`;
+            if(showT5) theadContent += `<th class="py-1 px-0.5 text-center bg-rose-900 text-white font-bold w-7">A. T5</th><th class="py-1 px-0.5 text-center bg-rose-800 text-white font-bold w-9">%C T5</th>`;
+            if(showT6) theadContent += `<th class="py-1 px-0.5 text-center bg-cyan-900 text-white font-bold w-7">A. T6</th><th class="py-1 px-0.5 text-center bg-cyan-800 text-white font-bold w-9">%C T6</th>`;
 
             function buildPageHtml(rowsHtml) {
                 return `
@@ -579,19 +587,17 @@
                             </div>
 
                             <div class="border-b-2 border-slate-800 pb-1.5 mb-2 flex justify-between items-end gap-3 shrink-0">
-                                <!-- Lado Esquerdo: Título em cima, Data embaixo -->
                                 <div class="flex flex-col">
                                     <h2 class="text-[14px] font-black text-slate-900 tracking-tight leading-tight">
                                         Resultados Consolidados 
                                     </h2>
                                     <span class="text-[10px] font-normal text-slate-600 mt-0.5">
-                                        (atualizado 02/11/2026 Tutores e 28/10/2026 Cursistas)
+                                        (atualizado 03/11/2026 Tutores e 03/11/2026 Cursistas)
                                     </span>
                                 </div>
 
-                                <!-- Lado Direito: Título da contagem e os contadores (com permissão para quebrar linha) -->
                                 <div class="text-[10px] font-bold text-slate-800 text-right max-w-[60%] leading-snug">
-                                    <span class="text-slate-600 text-[9px]">Atividades Entregues Tutores :</span><br>
+                                    <span class="text-slate-700 font-semibold text-[9px]">Atividades Entregues Tutores :</span><br>
                                     <div class="mt-0.5">
                                         ${summaryText}
                                     </div>
@@ -601,11 +607,11 @@
                             <div class="flex-grow flex flex-col w-full">
                                 <table class="w-full h-full text-left text-[8px] border-collapse">
                                     <thead>
-                                        <tr class="bg-slate-800 text-white font-bold uppercase text-[9px] leading-tight h-[1%]">
+                                        <tr class="bg-slate-900 text-white font-bold uppercase text-[9px] leading-tight h-[1%]">
                                             ${theadContent}
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-slate-200 border-b border-slate-200">
+                                    <tbody class="divide-y divide-slate-300 border-b border-slate-300">
                                         ${rowsHtml}
                                     </tbody>
                                 </table>
